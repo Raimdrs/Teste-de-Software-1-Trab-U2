@@ -62,8 +62,8 @@ public class CompraService
 			throw new IllegalStateException("Itens fora de estoque.");
 		}
 
-		// A chamada foi ajustada para passar o objeto 'cliente' inteiro.
-		BigDecimal custoTotal = calcularCustoTotal(carrinho, cliente);
+		// ajustado para passar o objeto 'cliente' inteiro.
+		BigDecimal custoTotal = calcularCustoTotal(carrinho, cliente.getRegiao(), cliente.getTipo());
 
 		PagamentoDTO pagamento = pagamentoExternal.autorizarPagamento(cliente.getId(), custoTotal.doubleValue());
 
@@ -92,27 +92,29 @@ public class CompraService
 	 * @param cliente O cliente que está realizando a compra.
 	 * @return O valor total da compra, arredondado para duas casas decimais.
 	 */
-	public BigDecimal calcularCustoTotal(CarrinhoDeCompras carrinho, Cliente cliente)
-	{
+	public BigDecimal calcularCustoTotal(CarrinhoDeCompras carrinho, Regiao regiao, TipoCliente tipoCliente){
 		// Validação básica
 		Objects.requireNonNull(carrinho, "Carrinho não pode ser nulo.");
-		Objects.requireNonNull(cliente, "Cliente não pode ser nulo.");
+		Objects.requireNonNull(regiao, "Região não pode ser nula.");
+		Objects.requireNonNull(tipoCliente, "Tipo de cliente não pode ser nulo.");
+
 		if (carrinho.getItens() == null || carrinho.getItens().isEmpty()) {
 			throw new IllegalArgumentException("Carrinho não pode estar vazio.");
 		}
+
 		validarItens(carrinho);
 
-		// Passo 1: Calcular Subtotal dos itens 
+		// Passo 1: Calcular Subtotal dos itens
 		BigDecimal subtotal = calcularSubtotal(carrinho);
 
-		// Passo 2: Aplicar desconto por valor de carrinho 
+		// Passo 2: Aplicar desconto por valor de carrinho
 		BigDecimal subtotalComDesconto = aplicarDescontoPorValor(subtotal);
 
-		// Passo 3: Calcular frete base e Passo 4: Aplicar benefício de nível do cliente 
-		BigDecimal freteFinal = calcularFrete(carrinho, cliente);
+		// Passo 3 e 4: Calcular frete + benefício do nível do cliente
+		BigDecimal freteFinal = calcularFrete(carrinho, regiao, tipoCliente);
 
 		// Passo 5: Calcular o total da compra
-		BigDecimal total = subtotalComDesconto.add(freteFinal); 
+		BigDecimal total = subtotalComDesconto.add(freteFinal);
 
 		// Arredondamento final para duas casas decimais
 		return total.setScale(2, RoundingMode.HALF_UP);
@@ -131,7 +133,7 @@ public class CompraService
 	private void validarItens(CarrinhoDeCompras carrinho) {
 		for (ItemCompra item : carrinho.getItens()) {
 			if (item.getQuantidade() <= 0) {
-				throw new IllegalArgumentException("A quantidade do item deve ser positiva."); 
+				throw new IllegalArgumentException("A quantidade do item deve ser positiva.");
 			}
 			if (item.getProduto().getPrecoUnitario().compareTo(BigDecimal.ZERO) < 0) {
 				throw new IllegalArgumentException("O preço do item não pode ser negativo.");
@@ -141,33 +143,30 @@ public class CompraService
 
 	private BigDecimal calcularSubtotal(CarrinhoDeCompras carrinho) {
 		return carrinho.getItens().stream()
-				.map(item -> item.getProduto().getPrecoUnitario().multiply(new BigDecimal(item.getQuantidade()))) 
+				.map(item -> item.getProduto().getPrecoUnitario()
+				.multiply(new BigDecimal(item.getQuantidade())))
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
 	private BigDecimal aplicarDescontoPorValor(BigDecimal subtotal) {
-		if (subtotal.compareTo(SUBTOTAL_LIMITE_DESCONTO_20) > 0) { // Se Subtotal > R$ 1000,00 -> 20% de desconto 
+		if (subtotal.compareTo(SUBTOTAL_LIMITE_DESCONTO_20) > 0) {
 			return subtotal.multiply(BigDecimal.ONE.subtract(DESCONTO_20_PORCENTO));
-		} else if (subtotal.compareTo(SUBTOTAL_LIMITE_DESCONTO_10) > 0) { // Se Subtotal > R$ 500,00 -> 10% de desconto 
+		} else if (subtotal.compareTo(SUBTOTAL_LIMITE_DESCONTO_10) > 0) {
 			return subtotal.multiply(BigDecimal.ONE.subtract(DESCONTO_10_PORCENTO));
 		}
-		return subtotal; // Se não for nenhum dos casos, retorna o subtotal sem desconto
-	}
+		return subtotal;
+		}
 
-	private BigDecimal calcularFrete(CarrinhoDeCompras carrinho, Cliente cliente) {
-		Regiao regiao = cliente.getRegiao();
-		TipoCliente nivelFidelidade = cliente.getNivelFidelidade();
+	private BigDecimal calcularFrete(CarrinhoDeCompras carrinho, Regiao regiao, TipoCliente tipoCliente) {
+    	// Cálculo do peso total tributável da compra
+    	double pesoTotalTributavel = carrinho.getItens().stream().mapToDouble(item -> {
+            Produto produto = item.getProduto();
+            double pesoCubico = (produto.getComprimento() * produto.getLargura() * produto.getAltura()) / FATOR_PESO_CUBICO;
+            double pesoTributavel = Math.max(produto.getPesoFisico(), pesoCubico);
+            return pesoTributavel * item.getQuantidade();
+        }).sum();
 
-		// Cálculo do peso total tributável da compra 
-		double pesoTotalTributavel = carrinho.getItens().stream()
-			.mapToDouble(item -> {
-				Produto produto = item.getProduto();
-				double pesoCubico = (produto.getComprimento() * produto.getLargura() * produto.getAltura()) / FATOR_PESO_CUBICO; 
-				double pesoTributavel = Math.max(produto.getPesoFisico(), pesoCubico);
-				return pesoTributavel * item.getQuantidade();
-			}).sum();
-
-		// Cálculo do frete por faixas de peso 
+		// Cálculo do frete por faixas de peso
 		BigDecimal freteBase = BigDecimal.ZERO;
 		if (pesoTotalTributavel > 50.0) {
 			freteBase = new BigDecimal(pesoTotalTributavel).multiply(new BigDecimal("7.00"));
@@ -177,29 +176,30 @@ public class CompraService
 			freteBase = new BigDecimal(pesoTotalTributavel).multiply(new BigDecimal("2.00"));
 		}
 
-		// Adição de taxas extras
+		// Adição de taxa mínima
 		if (freteBase.compareTo(BigDecimal.ZERO) > 0) {
-			freteBase = freteBase.add(TAXA_MINIMA_FRETE); // Taxa mínima de R$ 12,00 
+			freteBase = freteBase.add(TAXA_MINIMA_FRETE);
 		}
 
+		// Taxa extra por item frágil
 		for (ItemCompra item : carrinho.getItens()) {
 			if (item.getProduto().isFragil()) {
-				freteBase = freteBase.add(TAXA_ITEM_FRAGIL.multiply(new BigDecimal(item.getQuantidade()))); // Taxa de manuseio especial 
+				freteBase = freteBase.add(TAXA_ITEM_FRAGIL.multiply(new BigDecimal(item.getQuantidade())));
 			}
 		}
 
-		// Multiplicação pelo fator da região 
+		// Multiplicação pelo fator da região
 		BigDecimal freteComRegiao = freteBase.multiply(regiao.getMultiplicador());
 
-		// Aplicação do benefício de nível do cliente 
-		switch (nivelFidelidade) {
+    	// Desconto de fidelidade
+		switch (tipoCliente) {
 			case OURO:
-				return BigDecimal.ZERO; // 100% de desconto no frete 
+				return BigDecimal.ZERO;
 			case PRATA:
-				return freteComRegiao.multiply(DESCONTO_FRETE_PRATA); // 50% de desconto sobre o frete 
+				return freteComRegiao.multiply(DESCONTO_FRETE_PRATA);
 			case BRONZE:
 			default:
-				return freteComRegiao; // Paga o frete integral 
+				return freteComRegiao;
 		}
 	}
 }
