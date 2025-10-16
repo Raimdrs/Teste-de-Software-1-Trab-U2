@@ -93,7 +93,7 @@ public class CompraService
 	 * @return O valor total da compra, arredondado para duas casas decimais.
 	 */
 	public BigDecimal calcularCustoTotal(CarrinhoDeCompras carrinho, Regiao regiao, TipoCliente tipoCliente){
-		// Validação básica
+		// Validações iniciais
 		Objects.requireNonNull(carrinho, "Carrinho não pode ser nulo.");
 		Objects.requireNonNull(regiao, "Região não pode ser nula.");
 		Objects.requireNonNull(tipoCliente, "Tipo de cliente não pode ser nulo.");
@@ -140,7 +140,7 @@ public class CompraService
 			}
 		}
 	}
-
+	
 	private BigDecimal calcularSubtotal(CarrinhoDeCompras carrinho) {
 		return carrinho.getItens().stream()
 				.map(item -> item.getProduto().getPrecoUnitario()
