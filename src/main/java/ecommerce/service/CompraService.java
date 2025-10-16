@@ -105,15 +105,18 @@ public class CompraService
 		validarItens(carrinho);
 
 		// Passo 1: Calcular Subtotal dos itens
-		BigDecimal subtotal = calcularSubtotal(carrinho);
+        //BigDecimal subtotal = calcularSubtotal(carrinho);
 
-		// Passo 2: Aplicar desconto por valor de carrinho
-		BigDecimal subtotalComDesconto = aplicarDescontoPorValor(subtotal);
+        // Passo 2 Aplicar possível desconto por itens múltiplos
+        BigDecimal subtotalDescontoPorItem = calcularSubtotalComDescontoPorItens(carrinho);
 
-		// Passo 3 e 4: Calcular frete + benefício do nível do cliente
+		// Passo 3: Aplicar desconto por valor de carrinho
+		BigDecimal subtotalComDesconto = aplicarDescontoPorValor(subtotalDescontoPorItem);
+
+		// Passo 4 e 5: Calcular frete + benefício do nível do cliente
 		BigDecimal freteFinal = calcularFrete(carrinho, regiao, tipoCliente);
 
-		// Passo 5: Calcular o total da compra
+		// Passo 6: Calcular o total da compra
 		BigDecimal total = subtotalComDesconto.add(freteFinal);
 
 		// Arredondamento final para duas casas decimais
@@ -123,7 +126,9 @@ public class CompraService
 	// MÉTODOS AUXILIARES
 	private static final BigDecimal SUBTOTAL_LIMITE_DESCONTO_10 = new BigDecimal("500.00");
 	private static final BigDecimal SUBTOTAL_LIMITE_DESCONTO_20 = new BigDecimal("1000.00");
+    private static final BigDecimal DESCONTO_5_PORCENTO = new BigDecimal("0.05");
 	private static final BigDecimal DESCONTO_10_PORCENTO = new BigDecimal("0.10");
+    private static final BigDecimal DESCONTO_15_PORCENTO = new BigDecimal("0.15");
 	private static final BigDecimal DESCONTO_20_PORCENTO = new BigDecimal("0.20");
 	private static final double FATOR_PESO_CUBICO = 6000.0;
 	private static final BigDecimal TAXA_MINIMA_FRETE = new BigDecimal("12.00");
@@ -156,6 +161,50 @@ public class CompraService
 		}
 		return subtotal;
 		}
+
+    private BigDecimal calcularSubtotalComDescontoPorItens(CarrinhoDeCompras carrinho) {
+        final var qtdPorTipo = new java.util.HashMap<TipoProduto, Long>();
+        final var subtotalPorTipo = new java.util.HashMap<TipoProduto, BigDecimal>();
+
+        for (ItemCompra item : carrinho.getItens()) {
+            final Produto p = item.getProduto();
+            final TipoProduto tipo = p.getTipo();
+            final Long qtd = item.getQuantidade();
+
+            final BigDecimal valorItens =
+                    p.getPrecoUnitario().multiply(BigDecimal.valueOf(qtd));
+
+            qtdPorTipo.merge(tipo, qtd, Long::sum);
+            subtotalPorTipo.merge(tipo, valorItens, BigDecimal::add);
+        }
+
+        BigDecimal subtotalComDesconto = BigDecimal.ZERO;
+
+        for (var entry : subtotalPorTipo.entrySet()) {
+            final TipoProduto tipo = entry.getKey();
+            final BigDecimal subtotalGrupo = entry.getValue();
+            final long qtdGrupo = qtdPorTipo.getOrDefault(tipo, 0L);
+
+            final BigDecimal fatorDesconto = descontoPorQuantidade(qtdGrupo);
+            final BigDecimal multiplicador = BigDecimal.ONE.subtract(fatorDesconto);
+
+            subtotalComDesconto = subtotalComDesconto.add(subtotalGrupo.multiply(multiplicador));
+        }
+
+        return subtotalComDesconto;
+    }
+
+    /** Percentual de desconto (0.00, 0.05, 0.10, 0.15) conforme a quantidade do grupo. */
+    private BigDecimal descontoPorQuantidade(long qtdGrupo) {
+        if (qtdGrupo >= 8L) {
+            return DESCONTO_15_PORCENTO;
+        } else if (qtdGrupo >= 5L) {
+            return DESCONTO_10_PORCENTO;
+        } else if (qtdGrupo >= 3L) {
+            return DESCONTO_5_PORCENTO;
+        }
+        return BigDecimal.ZERO;
+    }
 
 	private BigDecimal calcularFrete(CarrinhoDeCompras carrinho, Regiao regiao, TipoCliente tipoCliente) {
     	// Cálculo do peso total tributável da compra
