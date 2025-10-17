@@ -93,7 +93,7 @@ public class CompraService
 	 * @return O valor total da compra, arredondado para duas casas decimais.
 	 */
 	public BigDecimal calcularCustoTotal(CarrinhoDeCompras carrinho, Regiao regiao, TipoCliente tipoCliente){
-		// Validações iniciais
+		// Validação básica
 		Objects.requireNonNull(carrinho, "Carrinho não pode ser nulo.");
 		Objects.requireNonNull(regiao, "Região não pode ser nula.");
 		Objects.requireNonNull(tipoCliente, "Tipo de cliente não pode ser nulo.");
@@ -137,21 +137,30 @@ public class CompraService
 
 	private void validarItens(CarrinhoDeCompras carrinho) {
 		for (ItemCompra item : carrinho.getItens()) {
+			Produto produto = item.getProduto();
 			if (item.getQuantidade() <= 0) {
 				throw new IllegalArgumentException("A quantidade do item deve ser positiva.");
 			}
 			if (item.getProduto().getPrecoUnitario().compareTo(BigDecimal.ZERO) < 0) {
 				throw new IllegalArgumentException("O preço do item não pode ser negativo.");
 			}
+						// Validação do Peso Físico
+			if (produto.getPesoFisico() <= 0) {
+				throw new IllegalArgumentException("O peso físico do item deve ser positivo.");
+			}
+			// Validação das Dimensões (essenciais para o peso cúbico)
+			if (produto.getComprimento() <= 0 || produto.getLargura() <= 0 || produto.getAltura() <= 0) {
+				throw new IllegalArgumentException("As dimensões (C, L, A) do item devem ser positivas.");
+			}
 		}
 	}
-	
-	private BigDecimal calcularSubtotal(CarrinhoDeCompras carrinho) {
-		return carrinho.getItens().stream()
-				.map(item -> item.getProduto().getPrecoUnitario()
-				.multiply(new BigDecimal(item.getQuantidade())))
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
-	}
+
+	//private BigDecimal calcularSubtotal(CarrinhoDeCompras carrinho) {
+	//	return carrinho.getItens().stream()
+	//			.map(item -> item.getProduto().getPrecoUnitario()
+	//			.multiply(new BigDecimal(item.getQuantidade())))
+	//			.reduce(BigDecimal.ZERO, BigDecimal::add);
+	//}
 
 	private BigDecimal aplicarDescontoPorValor(BigDecimal subtotal) {
 		if (subtotal.compareTo(SUBTOTAL_LIMITE_DESCONTO_20) > 0) {
