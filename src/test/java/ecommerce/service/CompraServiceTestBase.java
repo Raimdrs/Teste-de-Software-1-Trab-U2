@@ -47,26 +47,22 @@ public abstract class CompraServiceTestBase {
 
        // Subtotal > 500, Peso Leve (1kg)
         this.produtoLeve = new Produto(1L, "Celular", "...", new BigDecimal("900.00"), 1.0, 15, 8, 2, false, 
-            TipoProduto.ELETRONICO); // <-- Usando o Enum
+            TipoProduto.ELETRONICO); 
         
         // Subtotal > 1000, Peso Médio (8kg), Frágil
         this.produtoMedio = new Produto(2L, "Monitor 4k", "...", new BigDecimal("1200.00"), 8.0, 60, 40, 15, true, 
-            TipoProduto.ELETRONICO); // <-- Usando o Enum
+            TipoProduto.ELETRONICO); 
         
         // Subtotal < 500, Peso Pesado (15kg)
-        // Este é o produto do "teste do professor". 
-        // Para o teste esperar 1360.00, ele deve ser de um TIPO DIFERENTE do produtoLeve.
         this.produtoPesado = new Produto(3L, "Halter 15kg", "...", new BigDecimal("400.00"), 15.0, 30, 15, 15, false, 
-            TipoProduto.LIVRO); // <-- Usando um Enum DIFERENTE (ex: LIVRO, ou qualquer outro)
-                                //     (Sinta-se à vontade para mudar para ROUPA ou ALIMENTO se preferir)
-                                //     O importante é ser diferente de ELETRONICO.
+            TipoProduto.MOVEL);
 
         // Subtotal < 500, Peso Muito Pesado (60kg)
         this.produtoMuitoPesado = new Produto(4L, "Saco de Cimento", "...", new BigDecimal("100.00"), 60.0, 80, 50, 10, false, 
-            TipoProduto.MOVEL); // <-- Usando o Enum
+            TipoProduto.MOVEL); 
     
         // Produto com peso negativo (para testes de robustez)
         this.produtoComPesoErrado = new Produto(5L, "Produto Inválido", "...", new BigDecimal("100.00"), -60.0, 80, 50, 10, false, 
-            TipoProduto.MOVEL); // <-- Usando o Enum
+            TipoProduto.MOVEL);
     }
 }
