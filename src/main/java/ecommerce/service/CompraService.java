@@ -216,16 +216,49 @@ public class CompraService
     }
 
 	private BigDecimal calcularFrete(CarrinhoDeCompras carrinho, Regiao regiao, TipoCliente tipoCliente) {
-    	// Cálculo do peso total tributável da compra
-    	double pesoTotalTributavel = carrinho.getItens().stream().mapToDouble(item -> {
-            Produto produto = item.getProduto();
-            double pesoCubico = (produto.getComprimento() * produto.getLargura() * produto.getAltura()) / FATOR_PESO_CUBICO;
-            double pesoTributavel = Math.max(produto.getPesoFisico(), pesoCubico);
-            return pesoTributavel * item.getQuantidade();
-        }).sum();
+    	// 1. Calcular peso total tributável
+    	double pesoTotalTributavel = calcularPesoTotalTributavel(carrinho);
 
-		// Cálculo do frete por faixas de peso
+		// 2. Calcular frete base (baseado no peso + taxa mínima)
+		BigDecimal freteBase = calcularFreteBasePorPeso(pesoTotalTributavel);
+
+		// 3. Adicionar taxa de itens frágeis
+		BigDecimal taxaFragil = calcularTaxaItensFrageis(carrinho);
+
+		// 4. Somar frete base e taxas
+		BigDecimal freteAntesDaRegiao = freteBase.add(taxaFragil);
+
+		// 5. Multiplicação pelo fator da região
+		BigDecimal freteComRegiao = freteAntesDaRegiao.multiply(regiao.getMultiplicador());
+
+    	// 6. Aplicar desconto de fidelidade
+		return aplicarDescontoFidelidadeFrete(freteComRegiao, tipoCliente);
+	}
+
+	/*
+	 * Calcula o peso total tributável do carrinho, considerando o maior valor entre
+	 peso físico e peso cúbico (cubagem) de cada item.
+	 */
+	private double calcularPesoTotalTributavel(CarrinhoDeCompras carrinho) {
+		return carrinho.getItens().stream()
+				.mapToDouble(this::calcularPesoTributavelItem)
+				.sum();
+	}
+
+	//Calcula o peso tributável para um único ItemCompra (unidade * quantidade).
+	 
+	private double calcularPesoTributavelItem(ItemCompra item) {
+		Produto produto = item.getProduto();
+		double pesoCubico = (produto.getComprimento() * produto.getLargura() * produto.getAltura()) / FATOR_PESO_CUBICO;
+		double pesoTributavelUnidade = Math.max(produto.getPesoFisico(), pesoCubico);
+		return pesoTributavelUnidade * item.getQuantidade();
+	}
+
+	//Calcula o valor do frete base com base nas faixas de peso e aplica a taxa mínima.
+	 
+	private BigDecimal calcularFreteBasePorPeso(double pesoTotalTributavel) {
 		BigDecimal freteBase = BigDecimal.ZERO;
+
 		if (pesoTotalTributavel > 50.0) {
 			freteBase = new BigDecimal(pesoTotalTributavel).multiply(new BigDecimal("7.00"));
 		} else if (pesoTotalTributavel > 10.0) {
@@ -236,20 +269,24 @@ public class CompraService
 
 		// Adição de taxa mínima
 		if (freteBase.compareTo(BigDecimal.ZERO) > 0) {
-			freteBase = freteBase.add(TAXA_MINIMA_FRETE);
+			return freteBase.add(TAXA_MINIMA_FRETE);
 		}
+		
+		return freteBase; // Retorna 0 se nenhum frete foi calculado
+	}
 
-		// Taxa extra por item frágil
-		for (ItemCompra item : carrinho.getItens()) {
-			if (item.getProduto().isFragil()) {
-				freteBase = freteBase.add(TAXA_ITEM_FRAGIL.multiply(new BigDecimal(item.getQuantidade())));
-			}
-		}
+	//Calcula a taxa total adicional para itens frágeis no carrinho.
+	 
+	private BigDecimal calcularTaxaItensFrageis(CarrinhoDeCompras carrinho) {
+		return carrinho.getItens().stream()
+				.filter(item -> item.getProduto().isFragil())
+				.map(item -> TAXA_ITEM_FRAGIL.multiply(new BigDecimal(item.getQuantidade())))
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
 
-		// Multiplicação pelo fator da região
-		BigDecimal freteComRegiao = freteBase.multiply(regiao.getMultiplicador());
-
-    	// Desconto de fidelidade
+	//Aplica o desconto de frete com base no nível de fidelidade (TipoCliente).
+	
+	private BigDecimal aplicarDescontoFidelidadeFrete(BigDecimal freteComRegiao, TipoCliente tipoCliente) {
 		switch (tipoCliente) {
 			case OURO:
 				return BigDecimal.ZERO;
