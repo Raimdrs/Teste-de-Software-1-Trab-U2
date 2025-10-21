@@ -25,7 +25,7 @@
 |                                  | Não   | **P14**  |
 
 
-### esconto por Quantidade de Itens do Mesmo Tipo:
+### Desconto por Quantidade de Itens do Mesmo Tipo:
 
 | O tipo de cliente é BRONZE  | sim | p27 |
 |-----------------------------|-----|-----|
@@ -71,19 +71,6 @@ Carrinho com 1 item não frágil (qtd=1, preço=10, peso=4 kg, C=L=A=1), TipoPro
 
 Tudo que não é citado em cada linha permanece igual ao base.
 
-| Condição                 | Valor | Partição |
-| ------------------------ | ----- | -------- |
-| Tipo de cliente = BRONZE | Sim   | **P35**  |
-|                          | Não   | **P36**  |
-| Tipo de cliente = PRATA  | Sim   | **P37**  |
-|                          | Não   | **P38**  |
-| Tipo de cliente = OURO   | Sim   | **P39**  |
-|                          | Não   | **P40**  |
-| Tipo de cliente é nulo   | Sim   | **P41**  |
-|                          | Não   | **P42**  |
-
-
-
 
 
 | **Entrada (variação em relação ao cenário base)**         | **Saída Esperada**                                              | **Partição Coberta**                             |
@@ -113,4 +100,46 @@ Tudo que não é citado em cada linha permanece igual ao base.
 | `tipoCliente = null`                                      | Exceção (NullPointerException)                                  | **P41**                                          |
 
 
-~~~~
+## Testes de Análise de Valor Limite:
+
+### Testes para desconto aplicado por valor subtotal:
+
+| **ID** | **Input (Subtotal)** | **Contexto**                           | **R.E (Resultado Esperado)** | **Valor Final (R$)** |
+| ------ | -------------------- | -------------------------------------- | ---------------------------- | -------------------: |
+| L1     | R$ 499,00            | Cliente Bronze / 1 kg                  | SUCESSO (Desc. 0%)           |               499,00 |
+| L2     | R$ 500,00            | Cliente Bronze / 61 kg (frete faixa D) | SUCESSO (Desc. 0%)           |             1.037,00 |
+| L3     | R$ 500,01            | Cliente Bronze / 1 kg                  | SUCESSO (Desc. 10%)          |               450,01 |
+| L4     | R$ 999,00            | Cliente Bronze / 1 kg                  | SUCESSO (Desc. 10%)          |               899,10 |
+| L5     | R$ 1.000,00          | Cliente Bronze / 61 kg (frete faixa D) | SUCESSO (Desc. 10%)          |             1.339,00 |
+| L6     | R$ 1.000,01          | Cliente Bronze / 1 kg                  | SUCESSO (Desc. 20%)          |               800,01 |
+
+
+### Teste para calculo do frete com relação ao peso dos itens:
+
+Base dos casos: 1 item, preço R$ 100, cliente Bronze, região Sudeste.
+
+| **ID** | **Input (Peso Total)** | **Contexto**            | **R.E (Resultado Esperado)** | **Valor Final (R$)** |
+| ------ | ---------------------- | ----------------------- | ---------------------------- | -------------------: |
+| L7     | 5,00 kg                | Cliente Bronze / R$ 100 | SUCESSO (Frete isento)       |               100,00 |
+| L8     | 5,01 kg                | Cliente Bronze / R$ 100 | SUCESSO (Frete Faixa B)      |               122,02 |
+| L9     | 9,99 kg                | Cliente Bronze / R$ 100 | SUCESSO (Frete Faixa B)      |               131,98 |
+| L10    | 10,00 kg               | Cliente Bronze / R$ 100 | SUCESSO (Frete Faixa B)      |               132,00 |
+| L11    | 10,01 kg               | Cliente Bronze / R$ 100 | SUCESSO (Frete Faixa C)      |               152,04 |
+| L12    | 49,99 kg               | Cliente Bronze / R$ 100 | SUCESSO (Frete Faixa C)      |               311,96 |
+| L13    | 50,00 kg               | Cliente Bronze / R$ 100 | SUCESSO (Frete Faixa C)      |               312,00 |
+| L14    | 50,01 kg               | Cliente Bronze / R$ 100 | SUCESSO (Frete Faixa D)      |               462,07 |
+
+
+### Teste para múltiplos itens do mesmo tipo:
+
+Base: mesmo TipoProduto, preço unitário R$ 100, peso 0,5 kg por item 
+(para não interferir no frete), cliente Bronze, região Sudeste.
+
+| **ID** | **Input (Qtd. Mesmo Tipo)** | **Contexto**            | **R.E (Resultado Esperado)**         | **Valor Final (R$)** |
+|--------| --------------------------- | ----------------------- | ------------------------------------ | -------------------: |
+| L15    | 2 iténs                     | Cliente Bronze / 1 kg   | SUCESSO (Desc. Tipo 0%)              |               200,00 |
+| L16    | 3 iténs                     | Cliente Bronze / 1,5 kg | SUCESSO (Desc. Tipo 5%)              |               285,00 |
+| L17    | 4 iténs                     | Cliente Bronze / 2 kg   | SUCESSO (Desc. Tipo 5%)              |               380,00 |
+| L18    | 5 iténs                     | Cliente Bronze / 2,5 kg | SUCESSO (Desc. Tipo 10%)             |               450,00 |
+| L19    | 7 iténs                     | Cliente Bronze / 3,5 kg | SUCESSO (Desc. Tipo 10% + Valor 10%) |               567,00 |
+| L20    | 8 iténs                     | Cliente Bronze / 4 kg   | SUCESSO (Desc. Tipo 15% + Valor 10%) |               612,00 |

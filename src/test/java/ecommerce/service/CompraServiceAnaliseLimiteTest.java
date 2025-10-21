@@ -21,8 +21,8 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
     //---------- Testes de Valolres limites por preço ----------
 
     @Test
-    @DisplayName("Limite: Subtotal exatamente 499.00 (Sem desconto)")
-    void deveAplicarSemDescontoParaSubtotalExatamente499() {
+    @DisplayName("Limite: Subtotal exatamente 499.00 (Sem desconto) - L1")
+    void deveAplicarSemDescontoParaSubtotalExatamente499_L1() {
         // ARRANGE
         // Criar produto local para peso exato
         Produto produto499 = new Produto(11L, "Prod 1kg", "...", new BigDecimal("499.00"), 
@@ -41,8 +41,8 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
     }
     
     @Test
-    @DisplayName("Limite: Subtotal exatamente 500.00 (Sem desconto)")
-    void deveAplicarSemDescontoParaSubtotalExatamente500() {
+    @DisplayName("Limite: Subtotal exatamente 500.00 (Sem desconto) - L2")
+    void deveAplicarSemDescontoParaSubtotalExatamente500_L2() {
         // ARRANGE
         CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
         List<ItemCompra> itens = new ArrayList<>();
@@ -72,8 +72,8 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
     }
 
     @Test
-    @DisplayName("Limite: Subtotal exatamente 500.01 (Sem desconto)")
-    void deveAplicarSemDescontoParaSubtotalExatamente500_01() {
+    @DisplayName("Limite: Subtotal exatamente 500.01 (Sem desconto) - L3")
+    void deveAplicarSemDescontoParaSubtotalExatamente500_01_L3() {
         // ARRANGE
         // Criar produto local para peso exato
         Produto produto500_01 = new Produto(12L, "Prod 1kg", "...", new BigDecimal("500.01"), 
@@ -92,8 +92,8 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
     }
 
     @Test
-    @DisplayName("Limite: Subtotal exatamente 999.00 (Sem desconto)")
-    void deveAplicarSemDescontoParaSubtotalExatamente999() {
+    @DisplayName("Limite: Subtotal exatamente 999.00 (Sem desconto) - L4")
+    void deveAplicarSemDescontoParaSubtotalExatamente999_L4() {
         // ARRANGE
         // Criar produto local para peso exato
         Produto produto500_01 = new Produto(13L, "Prod 1kg", "...", new BigDecimal("999.00"), 
@@ -112,8 +112,8 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
     }
 
     @Test
-    @DisplayName("Limite: Subtotal exatamente 1000.00 (10% desconto)")
-    void deveAplicar10PorcentoDescontoParaSubtotalExatamente1000() {
+    @DisplayName("Limite: Subtotal exatamente 1000.00 (10% desconto) - L5")
+    void deveAplicar10PorcentoDescontoParaSubtotalExatamente1000_L5() {
         // ARRANGE
         CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
         List<ItemCompra> itens = new ArrayList<>();
@@ -143,8 +143,8 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
     }
 
     @Test
-    @DisplayName("Limite: Subtotal exatamente 1000.01 (Sem desconto)")
-    void deveAplicarSemDescontoParaSubtotalExatamente1000_01() {
+    @DisplayName("Limite: Subtotal exatamente 1000.01 (Sem desconto) - L6")
+    void deveAplicarSemDescontoParaSubtotalExatamente1000_01_L6() {
         // ARRANGE
         // Criar produto local para peso exato
         Produto produto1000_01 = new Produto(14L, "Prod 1kg", "...", new BigDecimal("1000.01"), 
@@ -165,8 +165,8 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
     // ---------- Testes de Valolres limites por Peso ----------
 
     @Test
-    @DisplayName("Limite: Peso exatamente 5.0kg (Limite do Frete Isento)")
-    void deveCalcularCustoTotalParaCincoItens()
+    @DisplayName("Limite: Peso exatamente 5.0kg (Limite do Frete Isento) - L7")
+    void deveCalcularCustoTotalParaCincoItens_L7()
     {
         // ARRANGE
         CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
@@ -198,8 +198,8 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
     }
 
     @Test
-    @DisplayName("Limite: Peso exatamente 5.01kg (Início Faixa B)")
-    void deveAplicarFreteFaixaBParaPesoMinimamenteAcimaDe5kg() {
+    @DisplayName("Limite: Peso exatamente 5.01kg (Início Faixa B) - L8")
+    void deveAplicarFreteFaixaBParaPesoMinimamenteAcimaDe5kg_L8() {
         // ARRANGE
         // Criar produto local para peso exato
         Produto produto5_01kg = new Produto(10L, "Prod 5.01kg", "...", new BigDecimal("100.00"), 
@@ -228,8 +228,22 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
     }
 
     @Test
-    @DisplayName("Limite: Peso exatamente 10.0kg (Fim Faixa B)")
-    void deveAplicarFreteFaixaBParaPesoExatamente10kg() {
+    @DisplayName("Limite: Peso exatamente 9.99kg (Faixa B) - L9")
+    void deveAplicarFreteFaixaBParaPeso9_99kg_L9() {
+        Produto p = new Produto(101L, "Prod 9.99kg", "...", new BigDecimal("100.00"),
+                9.99, 10, 10, 10, false, TipoProduto.LIVRO);
+
+        CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
+        carrinho.setItens(Collections.singletonList(new ItemCompra(1L, p, 1L)));
+
+        BigDecimal total = compraService.calcularCustoTotal(carrinho, clienteBronze.getRegiao(), clienteBronze.getTipo());
+        // frete: 2*9.99 + 12 = 31.98; total = 131.98
+        assertThat(total).isEqualByComparingTo("131.98");
+    }
+
+    @Test
+    @DisplayName("Limite: Peso exatamente 10.0kg (Fim Faixa B) - 10")
+    void deveAplicarFreteFaixaBParaPesoExatamente10kg_L10() {
         // ARRANGE
         Produto produto10kg = new Produto(11L, "Prod 10kg", "...", new BigDecimal("100.00"), 
                                           10.0, 10, 10, 10, false, TipoProduto.LIVRO);
@@ -257,8 +271,36 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
     }
 
     @Test
-    @DisplayName("Limite: Peso exatamente 50.0kg (Fim Faixa C)")
-    void deveAplicarFreteFaixaCParaPesoExatamente50kg() {
+    @DisplayName("Limite: Peso exatamente 10.01kg (início da Faixa C) - L11")
+    void deveAplicarFreteFaixaCParaPeso10_01kg_L11() {
+        Produto p = new Produto(102L, "Prod 10.01kg", "...", new BigDecimal("100.00"),
+                10.01, 10, 10, 10, false, TipoProduto.LIVRO);
+
+        CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
+        carrinho.setItens(Collections.singletonList(new ItemCompra(1L, p, 1L)));
+
+        BigDecimal total = compraService.calcularCustoTotal(carrinho, clienteBronze.getRegiao(), clienteBronze.getTipo());
+        // frete: 4*10.01 + 12 = 52.04; total = 152.04
+        assertThat(total).isEqualByComparingTo("152.04");
+    }
+
+    @Test
+    @DisplayName("Limite: Peso exatamente 49.99kg (Faixa C) - L12")
+    void deveAplicarFreteFaixaCParaPeso49_99kg_L12() {
+        Produto p = new Produto(103L, "Prod 49.99kg", "...", new BigDecimal("100.00"),
+                49.99, 10, 10, 10, false, TipoProduto.LIVRO);
+
+        CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
+        carrinho.setItens(Collections.singletonList(new ItemCompra(1L, p, 1L)));
+
+        BigDecimal total = compraService.calcularCustoTotal(carrinho, clienteBronze.getRegiao(), clienteBronze.getTipo());
+        // frete: 4*49.99 + 12 = 211.96; total = 311.96
+        assertThat(total).isEqualByComparingTo("311.96");
+    }
+
+    @Test
+    @DisplayName("Limite: Peso exatamente 50.0kg (Fim Faixa C) - L13")
+    void deveAplicarFreteFaixaCParaPesoExatamente50kg_L13() {
         // ARRANGE
         Produto produto50kg = new Produto(12L, "Prod 50kg", "...", new BigDecimal("100.00"), 
                                           50.0, 10, 10, 10, false, TipoProduto.LIVRO);
@@ -284,4 +326,81 @@ public class CompraServiceAnaliseLimiteTest extends CompraServiceTestBase {
             .as("Custo total para peso 50.0kg (limite final da Faixa C)")
             .isEqualByComparingTo("312.00");
     }
+
+    @Test
+    @DisplayName("Limite: Peso exatamente 50.01kg (início da Faixa D) - L14")
+    void deveAplicarFreteFaixaDParaPeso50_01kg_L14() {
+        Produto p = new Produto(104L, "Prod 50.01kg", "...", new BigDecimal("100.00"),
+                50.01, 10, 10, 10, false, TipoProduto.LIVRO);
+
+        CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
+        carrinho.setItens(Collections.singletonList(new ItemCompra(1L, p, 1L)));
+
+        BigDecimal total = compraService.calcularCustoTotal(carrinho, clienteBronze.getRegiao(), clienteBronze.getTipo());
+        // frete: 7*50.01 + 12 = 362.07; total = 462.07
+        assertThat(total).isEqualByComparingTo("462.07");
+    }
+
+    // ------------ Teste de múltiplos itens do mesmo tipo---------------
+
+    private Produto produtoGrupoPreco100Peso05Kg() {
+        // peso 0,5 kg para manter peso total <= 5kg até 8 itens (não interferir no frete)
+        return new Produto(200L, "Item Grupo", "...", new BigDecimal("100.00"),
+                0.5, 10, 10, 10, false, TipoProduto.ELETRONICO);
+    }
+
+    @Test
+    @DisplayName("Qtd. mesmo tipo: 2 itens (0%) - L15")
+    void deveAplicarDesconto0PorcentoPara2ItensDoMesmoTipo_L15() {
+        CarrinhoDeCompras c = new CarrinhoDeCompras();
+        c.setItens(Collections.singletonList(new ItemCompra(1L, produtoGrupoPreco100Peso05Kg(), 2L)));
+        BigDecimal total = compraService.calcularCustoTotal(c, clienteBronze.getRegiao(), clienteBronze.getTipo());
+        assertThat(total).isEqualByComparingTo("200.00");
+    }
+
+    @Test
+    @DisplayName("Qtd. mesmo tipo: 3 itens (5%) - L16")
+    void deveAplicarDesconto5PorcentoPara3ItensDoMesmoTipo_L16() {
+        CarrinhoDeCompras c = new CarrinhoDeCompras();
+        c.setItens(Collections.singletonList(new ItemCompra(1L, produtoGrupoPreco100Peso05Kg(), 3L)));
+        BigDecimal total = compraService.calcularCustoTotal(c, clienteBronze.getRegiao(), clienteBronze.getTipo());
+        assertThat(total).isEqualByComparingTo("285.00");
+    }
+
+    @Test
+    @DisplayName("Qtd. mesmo tipo: 4 itens (5%) - L17")
+    void deveAplicarDesconto5PorcentoPara4ItensDoMesmoTipo_L17() {
+        CarrinhoDeCompras c = new CarrinhoDeCompras();
+        c.setItens(Collections.singletonList(new ItemCompra(1L, produtoGrupoPreco100Peso05Kg(), 4L)));
+        BigDecimal total = compraService.calcularCustoTotal(c, clienteBronze.getRegiao(), clienteBronze.getTipo());
+        assertThat(total).isEqualByComparingTo("380.00");
+    }
+
+    @Test
+    @DisplayName("Qtd. mesmo tipo: 5 itens (10%) - L18")
+    void deveAplicarDesconto10PorcentoPara5ItensDoMesmoTipo_L18() {
+        CarrinhoDeCompras c = new CarrinhoDeCompras();
+        c.setItens(Collections.singletonList(new ItemCompra(1L, produtoGrupoPreco100Peso05Kg(), 5L)));
+        BigDecimal total = compraService.calcularCustoTotal(c, clienteBronze.getRegiao(), clienteBronze.getTipo());
+        assertThat(total).isEqualByComparingTo("450.00");
+    }
+
+    @Test
+    @DisplayName("Qtd. mesmo tipo: 7 itens (10% + 10% por valor) - L19")
+    void deveAplicarDesconto10PorcentoMaisValorPara7ItensDoMesmoTipo_L19() {
+        CarrinhoDeCompras c = new CarrinhoDeCompras();
+        c.setItens(Collections.singletonList(new ItemCompra(1L, produtoGrupoPreco100Peso05Kg(), 7L)));
+        BigDecimal total = compraService.calcularCustoTotal(c, clienteBronze.getRegiao(), clienteBronze.getTipo());
+        assertThat(total).isEqualByComparingTo("567.00");
+    }
+
+    @Test
+    @DisplayName("Qtd. mesmo tipo: 8 itens (15% + 10% por valor) - L20")
+    void deveAplicarDesconto15PorcentoMaisValorPara8ItensDoMesmoTipo_20() {
+        CarrinhoDeCompras c = new CarrinhoDeCompras();
+        c.setItens(Collections.singletonList(new ItemCompra(1L, produtoGrupoPreco100Peso05Kg(), 8L)));
+        BigDecimal total = compraService.calcularCustoTotal(c, clienteBronze.getRegiao(), clienteBronze.getTipo());
+        assertThat(total).isEqualByComparingTo("612.00");
+    }
+
 }
