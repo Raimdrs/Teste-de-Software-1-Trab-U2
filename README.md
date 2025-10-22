@@ -143,3 +143,13 @@ Base: mesmo TipoProduto, preço unitário R$ 100, peso 0,5 kg por item
 | L18    | 5 iténs                     | Cliente Bronze / 2,5 kg | SUCESSO (Desc. Tipo 10%)             |               450,00 |
 | L19    | 7 iténs                     | Cliente Bronze / 3,5 kg | SUCESSO (Desc. Tipo 10% + Valor 10%) |               567,00 |
 | L20    | 8 iténs                     | Cliente Bronze / 4 kg   | SUCESSO (Desc. Tipo 15% + Valor 10%) |               612,00 |
+
+
+### Complexidade ciclomática
+
+P_total = P(main) + P(validar) + P(descValor) + P(descItens) + P(descQtd) + P(freteTotal)
+P_total = 5 + 7 + 2 + 2 + 3 + 9
+P_total = 28
+V(G) = P_total + 1
+V(G) = 28 + 1
+V(G) = 29
