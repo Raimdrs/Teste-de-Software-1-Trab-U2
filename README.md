@@ -145,7 +145,114 @@ Base: mesmo TipoProduto, preço unitário R$ 100, peso 0,5 kg por item
 | L20    | 8 iténs                     | Cliente Bronze / 4 kg   | SUCESSO (Desc. Tipo 15% + Valor 10%) |               612,00 |
 
 
-### Complexidade ciclomática
+## Tabela de decisão:
+
+Essas tabelas especificando as regras de domínio foram feitas utilizando da ideia de dividir a 
+complexidade do método de estudo ***calcularCustoTotal()*** em métodos auxiliares, os métodos que pensamos
+foram ***validarItens()*** para validar incialmente os itens, ***calcularSubtotalComDescontoPorItens()***
+e ***aplicarDescontoPorValor()*** para ajudar na soma do subtotal e
+***calcularPesoTotalTributavel()***, ***calcularFreteBasePorPeso()***, ***calcularTaxaItensFrageis()*** e 
+***aplicarDescontoFidelidadeFrete()*** para ajudar com o calculo do frete.
+
+
+### ***validarItens()***:
+
+| **Condição**                                                                             | **D1** | **D2** | **D3** | **D4** | **D5** |
+| ---------------------------------------------------------------------------------------- |:------:|:------:|:------:|:------:|:------:|
+| Existe item com `quantidade == null` **ou** `quantidade ≤ 0`?                            |   T    |   F    |   F    |   F    |   F    |
+| Existe item com `precoUnitario < 0`?                                                     |   F    |   T    |   F    |   F    |   F    |
+| Existe item com `pesoFisico ≤ 0`?                                                        |   F    |   F    |   T    |   F    |   F    |
+| Existe item com `comprimento ≤ 0` **ou** `largura ≤ 0` **ou** `altura ≤ 0`?              |   F    |   F    |   F    |   T    |   F    |
+| Nenhuma das condições acima ocorre?                                                      |   F    |   F    |   F    |   F    |   T    |
+| **Ação**                                                                                 |        |        |        |        |        |
+| Lançar `IllegalArgumentException("A quantidade do item deve ser positiva.")`             | **X**  |        |        |        |        |
+| Lançar `IllegalArgumentException("O preço do item não pode ser negativo.")`              |        | **X**  |        |        |        |
+| Lançar `IllegalArgumentException("O peso físico do item deve ser positivo.")`            |        |        | **X**  |        |        |
+| Lançar `IllegalArgumentException("As dimensões (C, L, A) do item devem ser positivas.")` |        |        |        | **X**  |        |
+| Prosseguir (itens válidos)                                                               |        |        |        |        | **X**  |
+
+
+### ***calcularSubtotalComDescontoPorItens()***:
+
+| **Condição (por grupo)**               | **D6** | **D7** | **D8** | **D9** |
+| -------------------------------------- |:------:|:------:|:------:|:------:|
+| `qtdGrupo ≤ 2`                         |   T    |   F    |   F    |   F    |
+| `3 ≤ qtdGrupo ≤ 4`                     |   F    |   T    |   F    |   F    |
+| `5 ≤ qtdGrupo ≤ 7`                     |   F    |   F    |   T    |   F    |
+| `qtdGrupo ≥ 8`                         |   F    |   F    |   F    |   T    |
+| **Ação (por grupo)**                   |        |        |        |        |
+| Aplicar fator **1,00** (0%)            | **X**  |        |        |        |
+| Aplicar fator **0,95** (5%)            |        | **X**  |        |        |
+| Aplicar fator **0,90** (10%)           |        |        | **X**  |        |
+| Aplicar fator **0,85** (15%)           |        |        |        | **X**  |
+| **Somar subtotais de todos os grupos** | **X**  | **X**  | **X**  | **X**  |
+
+
+### ***aplicarDescontoPorValor()***:
+
+| **Condição**                  | **D10** | **D11** | **D12** |
+| ----------------------------- |:-------:|:-------:|:-------:|
+| `subtotal > 1000,00`          |    T    |    F    |    F    |
+| *(senão)* `subtotal > 500,00` |    F    |    T    |    F    |
+| Caso contrário                |    F    |    F    |    T    |
+| **Ação**                      |         |         |         |
+| Aplicar **20%** (× **0,80**)  |  **X**  |         |         |
+| Aplicar **10%** (× **0,90**)  |         |  **X**  |         |
+| **Sem desconto** (× **1,00**) |         |         |  **X**  |
+
+
+### ***calcularFreteBasePorPeso()***:
+
+| **Condição (peso `w`)**                             | **D13** | **D14** | **D15** | **D16** |
+| --------------------------------------------------- |:-------:|:-------:|:-------:|:-------:|
+| `0 ≤ w ≤ 5`                                         |    T    |    F    |    F    |    F    |
+| `5 < w ≤ 10`                                        |    F    |    T    |    F    |    F    |
+| `10 < w ≤ 50`                                       |    F    |    F    |    T    |    F    |
+| `w > 50`                                            |    F    |    F    |    F    |    T    |
+| **Ação (base)**                                     |         |         |         |         |
+| `freteBase = 0`                                     |  **X**  |         |         |         |
+| `freteBase = 2×w`                                   |         |  **X**  |         |         |
+| `freteBase = 4×w`                                   |         |         |  **X**  |         |
+| `freteBase = 7×w`                                   |         |         |         |  **X**  |
+| Se `freteBase > 0`, **somar + 12,00** (taxa mínima) |         |  **X**  |  **X**  |  **X**  |
+
+
+### ***calcularTaxaItensFrageis()***:
+
+| **Condição**                                      | **D17** | **D18** |
+| ------------------------------------------------- |:-------:|:-------:|
+| Existe item **frágil**?                           |    T    |    F    |
+| **Ação**                                          |         |         |
+| Somar **5,00 × quantidade** para cada item frágil |  **X**  |         |
+| Não somar taxa                                    |         |  **X**  |
+
+
+### ***multiplicarFretePorRegiao()***:
+
+| **Condição**                    | **D19** | **D20** | **D21** | **D22** | **D23** |
+| ------------------------------- |:-------:|:-------:|:-------:|:-------:|:-------:|
+| `Regiao = SUDESTE (1,00)`       |    T    |    F    |    F    |    F    |    F    |
+| `Regiao = SUL (1,05)`           |    F    |    T    |    F    |    F    |    F    |
+| `Regiao = NORDESTE (1,10)`      |    F    |    F    |    T    |    F    |    F    |
+| `Regiao = CENTRO_OESTE (1,20)`  |    F    |    F    |    F    |    T    |    F    |
+| `Regiao = NORTE (1,30)`         |    F    |    F    |    F    |    F    |    T    |
+| **Ação**                        |         |         |         |         |         |
+| `frete = frete × multiplicador` |  **X**  |  **X**  |  **X**  |  **X**  |  **X**  |
+
+### ***aplicarDescontoFidelidadeFrete()***
+
+| **Condição**                | **D24** | **D25** | **D26** |
+| --------------------------- |:-------:|:-------:|:-------:|
+| `TipoCliente = OURO`        |    T    |    F    |    F    |
+| `TipoCliente = PRATA`       |    F    |    T    |    F    |
+| `TipoCliente = BRONZE`      |    F    |    F    |    T    |
+| **Ação**                    |         |         |         |
+| `freteFinal = 0`            |  **X**  |         |         |
+| `freteFinal = frete × 0,50` |         |  **X**  |         |
+| `freteFinal = frete`        |         |         |  **X**  |
+
+
+## Complexidade ciclomática
 
 P_total = P(main) + P(validar) + P(descValor) + P(descItens) + P(descQtd) + P(freteTotal)
 P_total = 5 + 7 + 2 + 2 + 3 + 9

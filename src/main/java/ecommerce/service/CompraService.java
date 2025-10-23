@@ -104,19 +104,16 @@ public class CompraService
 
 		validarItens(carrinho);
 
-		// Passo 1: Calcular Subtotal dos itens
-        //BigDecimal subtotal = calcularSubtotal(carrinho);
-
-        // Passo 2 Aplicar possível desconto por itens múltiplos
+        // Passo 1 Aplicar possível desconto por itens múltiplos
         BigDecimal subtotalDescontoPorItem = calcularSubtotalComDescontoPorItens(carrinho);
 
-		// Passo 3: Aplicar desconto por valor de carrinho
+		// Passo 2: Aplicar desconto por valor de carrinho
 		BigDecimal subtotalComDesconto = aplicarDescontoPorValor(subtotalDescontoPorItem);
 
-		// Passo 4 e 5: Calcular frete + benefício do nível do cliente
+		// Passo 3 e 4: Calcular frete + benefício do nível do cliente
 		BigDecimal freteFinal = calcularFrete(carrinho, regiao, tipoCliente);
 
-		// Passo 6: Calcular o total da compra
+		// Passo 5: Calcular o total da compra
 		BigDecimal total = subtotalComDesconto.add(freteFinal);
 
 		// Arredondamento final para duas casas decimais
@@ -276,7 +273,7 @@ public class CompraService
 	}
 
 	//Calcula a taxa total adicional para itens frágeis no carrinho.
-	 
+
 	private BigDecimal calcularTaxaItensFrageis(CarrinhoDeCompras carrinho) {
 		return carrinho.getItens().stream()
 				.filter(item -> item.getProduto().isFragil())
