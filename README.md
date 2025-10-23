@@ -272,11 +272,11 @@ V(G) = 29
 ## Aplicar Desconto Por Valor
 ![Logo](assets/aplicarDescontoPorValor.svg)
 
-## Calcular Frete Base Por Peso
-![Logo](assets/calcularFreteBasePorPeso.svg)
-
 ## Desconto Por Quantidade
 ![Logo](assets/DescontoPorQuantidade.svg)
+
+## Calcular Frete Base Por Peso
+![Logo](assets/calcularFreteBasePorPeso.svg)
 
 ## Aplicar Desconto Fidelidade Frete
 ![Logo](assets/aplicarDescontoFidelidadeFrete.svg)
