@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="397pt" height="387pt" viewBox="0.00 0.00 397.00 387.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 382.8)">
+<title>aplicarDescontoPorValor</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-382.8 392.5,-382.8 392.5,4 -4,4"/>
+<!-- N1 -->
+<g id="node1" class="node">
+<title>N1</title>
+<path fill="none" stroke="black" d="M214.59,-378.8C214.59,-378.8 37.15,-378.8 37.15,-378.8 31.15,-378.8 25.15,-372.8 25.15,-366.8 25.15,-366.8 25.15,-354.8 25.15,-354.8 25.15,-348.8 31.15,-342.8 37.15,-342.8 37.15,-342.8 214.59,-342.8 214.59,-342.8 220.59,-342.8 226.59,-348.8 226.59,-354.8 226.59,-354.8 226.59,-366.8 226.59,-366.8 226.59,-372.8 220.59,-378.8 214.59,-378.8"/>
+<text xml:space="preserve" text-anchor="middle" x="125.87" y="-356.6" font-family="Times,serif" font-size="14.00">Início: aplicarDescontoPorValor</text>
+</g>
+<!-- N2 -->
+<g id="node2" class="node">
+<title>N2</title>
+<path fill="none" stroke="black" d="M184.92,-305.8C184.92,-305.8 66.82,-305.8 66.82,-305.8 60.82,-305.8 54.82,-299.8 54.82,-293.8 54.82,-293.8 54.82,-281.8 54.82,-281.8 54.82,-275.8 60.82,-269.8 66.82,-269.8 66.82,-269.8 184.92,-269.8 184.92,-269.8 190.92,-269.8 196.92,-275.8 196.92,-281.8 196.92,-281.8 196.92,-293.8 196.92,-293.8 196.92,-299.8 190.92,-305.8 184.92,-305.8"/>
+<text xml:space="preserve" text-anchor="middle" x="125.87" y="-283.6" font-family="Times,serif" font-size="14.00">if (subtotal &gt; 1000.00)</text>
+</g>
+<!-- N1&#45;&gt;N2 -->
+<g id="edge1" class="edge">
+<title>N1-&gt;N2</title>
+<path fill="none" stroke="black" d="M125.87,-342.61C125.87,-335.03 125.87,-325.9 125.87,-317.34"/>
+<polygon fill="black" stroke="black" points="129.37,-317.34 125.87,-307.34 122.37,-317.34 129.37,-317.34"/>
+</g>
+<!-- N3 -->
+<g id="node3" class="node">
+<title>N3</title>
+<path fill="none" stroke="black" d="M151.75,-163C151.75,-163 12,-163 12,-163 6,-163 0,-157 0,-151 0,-151 0,-139 0,-139 0,-133 6,-127 12,-127 12,-127 151.75,-127 151.75,-127 157.75,-127 163.75,-133 163.75,-139 163.75,-139 163.75,-151 163.75,-151 163.75,-157 157.75,-163 151.75,-163"/>
+<text xml:space="preserve" text-anchor="middle" x="81.87" y="-140.8" font-family="Times,serif" font-size="14.00">return subtotal * (1 - 0.20)</text>
+</g>
+<!-- N2&#45;&gt;N3 -->
+<g id="edge2" class="edge">
+<title>N2-&gt;N3</title>
+<path fill="none" stroke="black" d="M99.68,-269.36C94.18,-264.38 89.08,-258.46 85.91,-251.8 74.43,-227.72 74.67,-196.94 77.03,-174.8"/>
+<polygon fill="black" stroke="black" points="80.49,-175.35 78.3,-164.98 73.54,-174.45 80.49,-175.35"/>
+<text xml:space="preserve" text-anchor="middle" x="117.39" y="-239.2" font-family="Times,serif" font-size="14.00">Verdadeiro</text>
+</g>
+<!-- N4 -->
+<g id="node4" class="node">
+<title>N4</title>
+<path fill="none" stroke="black" d="M259.06,-217C259.06,-217 122.69,-217 122.69,-217 116.69,-217 110.69,-211 110.69,-205 110.69,-205 110.69,-193 110.69,-193 110.69,-187 116.69,-181 122.69,-181 122.69,-181 259.06,-181 259.06,-181 265.06,-181 271.06,-187 271.06,-193 271.06,-193 271.06,-205 271.06,-205 271.06,-211 265.06,-217 259.06,-217"/>
+<text xml:space="preserve" text-anchor="middle" x="190.87" y="-194.8" font-family="Times,serif" font-size="14.00">else if (subtotal &gt; 500.00)</text>
+</g>
+<!-- N2&#45;&gt;N4 -->
+<g id="edge3" class="edge">
+<title>N2-&gt;N4</title>
+<path fill="none" stroke="black" d="M138.71,-269.65C147.91,-257.37 160.48,-240.59 170.97,-226.58"/>
+<polygon fill="black" stroke="black" points="173.74,-228.72 176.93,-218.62 168.13,-224.53 173.74,-228.72"/>
+<text xml:space="preserve" text-anchor="middle" x="179.36" y="-239.2" font-family="Times,serif" font-size="14.00">Falso</text>
+</g>
+<!-- N_FIM -->
+<g id="node7" class="node">
+<title>N_FIM</title>
+<ellipse fill="none" stroke="black" cx="190.87" cy="-18" rx="27" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="190.87" y="-13.8" font-family="Times,serif" font-size="14.00">Fim</text>
+</g>
+<!-- N3&#45;&gt;N_FIM -->
+<g id="edge6" class="edge">
+<title>N3-&gt;N_FIM</title>
+<path fill="none" stroke="black" d="M82.59,-126.64C84.02,-111.19 88.15,-88.69 99.87,-73 114.1,-53.97 137.17,-40.38 156.53,-31.6"/>
+<polygon fill="black" stroke="black" points="157.89,-34.82 165.72,-27.69 155.15,-28.38 157.89,-34.82"/>
+</g>
+<!-- N5 -->
+<g id="node5" class="node">
+<title>N5</title>
+<path fill="none" stroke="black" d="M260.75,-109C260.75,-109 121,-109 121,-109 115,-109 109,-103 109,-97 109,-97 109,-85 109,-85 109,-79 115,-73 121,-73 121,-73 260.75,-73 260.75,-73 266.75,-73 272.75,-79 272.75,-85 272.75,-85 272.75,-97 272.75,-97 272.75,-103 266.75,-109 260.75,-109"/>
+<text xml:space="preserve" text-anchor="middle" x="190.87" y="-86.8" font-family="Times,serif" font-size="14.00">return subtotal * (1 - 0.10)</text>
+</g>
+<!-- N4&#45;&gt;N5 -->
+<g id="edge4" class="edge">
+<title>N4-&gt;N5</title>
+<path fill="none" stroke="black" d="M190.87,-180.97C190.87,-164.76 190.87,-140.06 190.87,-120.79"/>
+<polygon fill="black" stroke="black" points="194.37,-120.85 190.87,-110.85 187.37,-120.85 194.37,-120.85"/>
+<text xml:space="preserve" text-anchor="middle" x="222.36" y="-140.8" font-family="Times,serif" font-size="14.00">Verdadeiro</text>
+</g>
+<!-- N6 -->
+<g id="node6" class="node">
+<title>N6</title>
+<path fill="none" stroke="black" d="M376.5,-109C376.5,-109 303.24,-109 303.24,-109 297.24,-109 291.24,-103 291.24,-97 291.24,-97 291.24,-85 291.24,-85 291.24,-79 297.24,-73 303.24,-73 303.24,-73 376.5,-73 376.5,-73 382.5,-73 388.5,-79 388.5,-85 388.5,-85 388.5,-97 388.5,-97 388.5,-103 382.5,-109 376.5,-109"/>
+<text xml:space="preserve" text-anchor="middle" x="339.87" y="-86.8" font-family="Times,serif" font-size="14.00">return subtotal</text>
+</g>
+<!-- N4&#45;&gt;N6 -->
+<g id="edge5" class="edge">
+<title>N4-&gt;N6</title>
+<path fill="none" stroke="black" d="M227.93,-180.6C237.92,-175.38 248.54,-169.35 257.87,-163 277.97,-149.32 298.65,-131.39 314.21,-116.96"/>
+<polygon fill="black" stroke="black" points="316.31,-119.8 321.2,-110.4 311.51,-114.7 316.31,-119.8"/>
+<text xml:space="preserve" text-anchor="middle" x="317.03" y="-140.8" font-family="Times,serif" font-size="14.00">Falso</text>
+</g>
+<!-- N5&#45;&gt;N_FIM -->
+<g id="edge7" class="edge">
+<title>N5-&gt;N_FIM</title>
+<path fill="none" stroke="black" d="M190.87,-72.81C190.87,-65.23 190.87,-56.1 190.87,-47.54"/>
+<polygon fill="black" stroke="black" points="194.37,-47.54 190.87,-37.54 187.37,-47.54 194.37,-47.54"/>
+</g>
+<!-- N6&#45;&gt;N_FIM -->
+<g id="edge8" class="edge">
+<title>N6-&gt;N_FIM</title>
+<path fill="none" stroke="black" d="M303.42,-72.63C278.62,-60.81 246.12,-45.33 222.43,-34.04"/>
+<polygon fill="black" stroke="black" points="224.12,-30.96 213.58,-29.82 221.11,-37.28 224.12,-30.96"/>
+</g>
+</g>
+</svg>
