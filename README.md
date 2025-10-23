@@ -263,20 +263,20 @@ V(G) = 29
 
 ### Grafos dos Metodos
 
+## Calcular Custo Total
+![Logo](assets/ValidaçãoDeNulos.svg)
+
 ## Validar Itens
 ![Logo](assets/ValidarItens.svg)
 
-## Calcular Custo Total
-![Logo](assets/ValidaçãoDeNulos.svg)
+## Aplicar Desconto Por Valor
+![Logo](assets/aplicarDescontoPorValor.svg)
 
 ## Calcular Frete Base Por Peso
 ![Logo](assets/calcularFreteBasePorPeso.svg)
 
 ## Desconto Por Quantidade
 ![Logo](assets/DescontoPorQuantidade.svg)
-
-## Aplicar Desconto Por Valor
-![Logo](assets/aplicarDescontoPorValor.svg)
 
 ## Aplicar Desconto Fidelidade Frete
 ![Logo](assets/aplicarDescontoFidelidadeFrete.svg)
