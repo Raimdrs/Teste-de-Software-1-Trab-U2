@@ -252,7 +252,7 @@ e ***aplicarDescontoPorValor()*** para ajudar na soma do subtotal e
 | `freteFinal = frete`        |         |         |  **X**  |
 
 
-## Complexidade ciclomática
+### Complexidade ciclomática
 
 P_total = P(main) + P(validar) + P(descValor) + P(descItens) + P(descQtd) + P(freteTotal)
 P_total = 5 + 7 + 2 + 2 + 3 + 9
@@ -263,12 +263,17 @@ V(G) = 29
 
 ### Grafos dos Metodos
 
+## Validar Itens
 ![Logo](assets/ValidarItens.svg)
 
+## Validação De Nulos
 ![Logo](assets/ValidaçãoDeNulos.svg)
 
+## Calcular Frete Base Por Peso
 ![Logo](assets/calcularFreteBasePorPeso.svg)
 
+## Aplicar Desconto Por Valor
 ![Logo](assets/aplicarDescontoPorValor.svg)
 
+## Aplicar Desconto Fidelidade Frete
 ![Logo](assets/aplicarDescontoFidelidadeFrete.svg)
