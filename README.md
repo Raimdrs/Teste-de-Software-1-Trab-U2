@@ -260,3 +260,15 @@ P_total = 28
 V(G) = P_total + 1
 V(G) = 28 + 1
 V(G) = 29
+
+### Grafos dos Metodos
+
+![Logo](assets/ValidarItens.svg)
+
+![Logo](assets/ValidaçãoDeNulos.svg)
+
+![Logo](assets/calcularFreteBasePorPeso.svg)
+
+![Logo](assets/aplicarDescontoPorValor.svg)
+
+![Logo](assets/aplicarDescontoFidelidadeFrete.svg)
