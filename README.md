@@ -266,11 +266,14 @@ V(G) = 29
 ## Validar Itens
 ![Logo](assets/ValidarItens.svg)
 
-## Validação De Nulos
+## Calcular Custo Total
 ![Logo](assets/ValidaçãoDeNulos.svg)
 
 ## Calcular Frete Base Por Peso
 ![Logo](assets/calcularFreteBasePorPeso.svg)
+
+## Desconto Por Quantidade
+![Logo](assets/DescontoPorQuantidade.svg)
 
 ## Aplicar Desconto Por Valor
 ![Logo](assets/aplicarDescontoPorValor.svg)
