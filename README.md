@@ -170,7 +170,7 @@ e ***aplicarDescontoPorValor()*** para ajudar na soma do subtotal e
 | Lançar `IllegalArgumentException("O peso físico do item deve ser positivo.")`            |        |        | **X**  |        |        |
 | Lançar `IllegalArgumentException("As dimensões (C, L, A) do item devem ser positivas.")` |        |        |        | **X**  |        |
 | Prosseguir (itens válidos)                                                               |        |        |        |        | **X**  |
-
+    
 
 ### ***calcularSubtotalComDescontoPorItens()***:
 

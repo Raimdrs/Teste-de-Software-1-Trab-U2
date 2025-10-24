@@ -132,7 +132,7 @@ public class CompraService
 	private static final BigDecimal TAXA_ITEM_FRAGIL = new BigDecimal("5.00");
 	private static final BigDecimal DESCONTO_FRETE_PRATA = new BigDecimal("0.50");
 
-	private void validarItens(CarrinhoDeCompras carrinho) {
+	public void validarItens(CarrinhoDeCompras carrinho) {
 		for (ItemCompra item : carrinho.getItens()) {
 			Produto produto = item.getProduto();
 			if (item.getQuantidade() <= 0) {
@@ -159,16 +159,18 @@ public class CompraService
 	//			.reduce(BigDecimal.ZERO, BigDecimal::add);
 	//}
 
-	private BigDecimal aplicarDescontoPorValor(BigDecimal subtotal) {
+    public BigDecimal aplicarDescontoPorValor(BigDecimal subtotal) {
 		if (subtotal.compareTo(SUBTOTAL_LIMITE_DESCONTO_20) > 0) {
-			return subtotal.multiply(BigDecimal.ONE.subtract(DESCONTO_20_PORCENTO));
+			BigDecimal temp = subtotal.multiply(BigDecimal.ONE.subtract(DESCONTO_20_PORCENTO));
+            return temp.setScale(2, RoundingMode.HALF_UP);
 		} else if (subtotal.compareTo(SUBTOTAL_LIMITE_DESCONTO_10) > 0) {
-			return subtotal.multiply(BigDecimal.ONE.subtract(DESCONTO_10_PORCENTO));
+            BigDecimal temp = subtotal.multiply(BigDecimal.ONE.subtract(DESCONTO_10_PORCENTO));
+            return temp.setScale(2, RoundingMode.HALF_UP);
 		}
 		return subtotal;
 		}
 
-    private BigDecimal calcularSubtotalComDescontoPorItens(CarrinhoDeCompras carrinho) {
+    public BigDecimal calcularSubtotalComDescontoPorItens(CarrinhoDeCompras carrinho) {
         final var qtdPorTipo = new java.util.HashMap<TipoProduto, Long>();
         final var subtotalPorTipo = new java.util.HashMap<TipoProduto, BigDecimal>();
 
@@ -197,11 +199,11 @@ public class CompraService
             subtotalComDesconto = subtotalComDesconto.add(subtotalGrupo.multiply(multiplicador));
         }
 
-        return subtotalComDesconto;
+        return subtotalComDesconto.setScale(2, RoundingMode.HALF_UP);
     }
 
     /** Percentual de desconto (0.00, 0.05, 0.10, 0.15) conforme a quantidade do grupo. */
-    private BigDecimal descontoPorQuantidade(long qtdGrupo) {
+    public BigDecimal descontoPorQuantidade(long qtdGrupo) {
         if (qtdGrupo >= 8L) {
             return DESCONTO_15_PORCENTO;
         } else if (qtdGrupo >= 5L) {
@@ -212,7 +214,7 @@ public class CompraService
         return BigDecimal.ZERO;
     }
 
-	private BigDecimal calcularFrete(CarrinhoDeCompras carrinho, Regiao regiao, TipoCliente tipoCliente) {
+    public BigDecimal calcularFrete(CarrinhoDeCompras carrinho, Regiao regiao, TipoCliente tipoCliente) {
     	// 1. Calcular peso total tributável
     	double pesoTotalTributavel = calcularPesoTotalTributavel(carrinho);
 
@@ -236,24 +238,25 @@ public class CompraService
 	 * Calcula o peso total tributável do carrinho, considerando o maior valor entre
 	 peso físico e peso cúbico (cubagem) de cada item.
 	 */
-	private double calcularPesoTotalTributavel(CarrinhoDeCompras carrinho) {
+    public double calcularPesoTotalTributavel(CarrinhoDeCompras carrinho) {
 		return carrinho.getItens().stream()
 				.mapToDouble(this::calcularPesoTributavelItem)
 				.sum();
 	}
 
 	//Calcula o peso tributável para um único ItemCompra (unidade * quantidade).
-	 
-	private double calcularPesoTributavelItem(ItemCompra item) {
+
+    public double calcularPesoTributavelItem(ItemCompra item) {
 		Produto produto = item.getProduto();
 		double pesoCubico = (produto.getComprimento() * produto.getLargura() * produto.getAltura()) / FATOR_PESO_CUBICO;
 		double pesoTributavelUnidade = Math.max(produto.getPesoFisico(), pesoCubico);
 		return pesoTributavelUnidade * item.getQuantidade();
+
 	}
 
 	//Calcula o valor do frete base com base nas faixas de peso e aplica a taxa mínima.
-	 
-	private BigDecimal calcularFreteBasePorPeso(double pesoTotalTributavel) {
+
+    public BigDecimal calcularFreteBasePorPeso(double pesoTotalTributavel) {
 		BigDecimal freteBase = BigDecimal.ZERO;
 
 		if (pesoTotalTributavel > 50.0) {
@@ -266,15 +269,17 @@ public class CompraService
 
 		// Adição de taxa mínima
 		if (freteBase.compareTo(BigDecimal.ZERO) > 0) {
-			return freteBase.add(TAXA_MINIMA_FRETE);
+            BigDecimal temp = freteBase.add(TAXA_MINIMA_FRETE);
+            return temp.setScale(2, RoundingMode.HALF_UP);
 		}
-		
-		return freteBase; // Retorna 0 se nenhum frete foi calculado
+
+        return freteBase.setScale(2, RoundingMode.HALF_UP);
+		//return freteBase; // Retorna 0 se nenhum frete foi calculado
 	}
 
 	//Calcula a taxa total adicional para itens frágeis no carrinho.
 
-	private BigDecimal calcularTaxaItensFrageis(CarrinhoDeCompras carrinho) {
+    public BigDecimal calcularTaxaItensFrageis(CarrinhoDeCompras carrinho) {
 		return carrinho.getItens().stream()
 				.filter(item -> item.getProduto().isFragil())
 				.map(item -> TAXA_ITEM_FRAGIL.multiply(new BigDecimal(item.getQuantidade())))
@@ -282,8 +287,8 @@ public class CompraService
 	}
 
 	//Aplica o desconto de frete com base no nível de fidelidade (TipoCliente).
-	
-	private BigDecimal aplicarDescontoFidelidadeFrete(BigDecimal freteComRegiao, TipoCliente tipoCliente) {
+
+    public BigDecimal aplicarDescontoFidelidadeFrete(BigDecimal freteComRegiao, TipoCliente tipoCliente) {
 		switch (tipoCliente) {
 			case OURO:
 				return BigDecimal.ZERO;
