@@ -11,114 +11,6 @@ import org.junit.jupiter.api.Test;
 import ecommerce.entity.CarrinhoDeCompras;
 import ecommerce.entity.ItemCompra;
 
-/*
-public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase {
-
-    @Test
-    @DisplayName("Partição: Subtotal (500, 1000] (10% desc), Peso [0, 5] (Isento)")
-    void deveCalcularCustoTotalParaSubtotalFaixa2FreteIsento()
-    {
-        // ARRANGE
-        CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
-        ItemCompra itemUnico = new ItemCompra(1L, produtoLeve, 1L); // R$ 900.00, 1kg
-        carrinho.setItens(Collections.singletonList(itemUnico));
-
-        // --- Cálculo Esperado ---
-        // Subtotal: 900.00 -> Com desc 10%: 810.00
-        // Peso Total: 1.0kg -> Frete Isento (R$ 0.00)
-        // Total: 810.00
-
-        // ACT
-        BigDecimal custoTotalCalculado = compraService.calcularCustoTotal(carrinho, clienteBronze.getRegiao(), clienteBronze.getTipo());
-
-        // ASSERT
-        assertThat(custoTotalCalculado).isEqualByComparingTo("810.00");
-    }
-
-    @Test
-    @DisplayName("Partição: Subtotal [0, 500] (Sem desc), Peso (10, 50] (Frete C)")
-    void deveCalcularFreteParaFaixaDePesoEntre10e50kg() {
-        // ARRANGE
-        CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
-        ItemCompra item = new ItemCompra(1L, produtoPesado, 1L); // R$ 400.00, 15kg
-        carrinho.setItens(Collections.singletonList(item));
-
-        // --- Cálculo Esperado ---
-        // Subtotal: 400.00 (Sem desconto)
-        // Peso: 15.0kg -> Frete: 15.0 * 4.00/kg = 60.00
-        // Frete + Taxa Mínima (+12.00) = 72.00
-        // Frete com Região (1.00): 72.00 * 1.0 = 72.00
-        // Frete com Desconto Bronze (0%): 72.00
-        // Total Final: 400.00 + 72.00 = 472.00
-
-        // ACT
-        BigDecimal custoTotal = compraService.calcularCustoTotal(carrinho, clienteBronze.getRegiao(), clienteBronze.getTipo());
-
-        // ASSERT
-        assertThat(custoTotal).isEqualByComparingTo("472.00");
-    }
-
-    @Test
-    @DisplayName("Partição: Subtotal [0, 500] (Sem desc), Peso > 50 (Frete D)")
-    void deveCalcularFreteParaFaixaDePesoAcimaDe50kg() {
-        // ARRANGE
-        CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
-        ItemCompra item = new ItemCompra(1L, produtoMuitoPesado, 1L); // R$ 100.00, 60kg
-        carrinho.setItens(Collections.singletonList(item));
-
-        // --- Cálculo Esperado ---
-        // Subtotal: 100.00 (Sem desconto)
-        // Peso: 60.0kg -> Frete: 60.0 * 7.00/kg = 420.00
-        // Frete + Taxa Mínima (+12.00) = 432.00
-        // Frete com Região (1.00): 432.00 * 1.0 = 432.00
-        // Frete com Desconto Bronze (0%): 432.00
-        // Total Final: 100.00 + 432.00 = 532.00
-
-        // ACT
-        BigDecimal custoTotal = compraService.calcularCustoTotal(carrinho, clienteBronze.getRegiao(), clienteBronze.getTipo());
-
-        // ASSERT
-        assertThat(custoTotal).isEqualByComparingTo("532.00");
-    }
-
-    @Test
-    @DisplayName("Partição: Subtotal > 1000 (20% desc), Peso [0, 5] (Isento) com 3 itens")
-    void deveCalcularCustoTotalParaTresItens()
-    {
-        // ARRANGE
-        CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
-        // 3 * 900 = 2700 (Subtotal Faixa 3)
-        // 3 * 1kg = 3kg (Peso Faixa Isenta)
-        ItemCompra itemUnico = new ItemCompra(1L, produtoLeve, 3L);
-        carrinho.setItens(Collections.singletonList(itemUnico));
-
-        // ACT
-        BigDecimal custoTotalCalculado = compraService.calcularCustoTotal(carrinho, clienteBronze.getRegiao(), clienteBronze.getTipo());
-
-        // ASSERT
-        assertThat(custoTotalCalculado).isEqualByComparingTo("2052.00");
-    }
-
-    @Test
-    @DisplayName("Partição: Subtotal > 1000 (20% desc), Peso (5, 10] (Frete B) com 8 itens")
-    void deveCalcularCustoTotalParaVariosItens()
-    {
-        // ARRANGE
-        CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
-        // 8 * 900 = 7200 (Subtotal Faixa 3)
-        // 8 * 1kg = 8kg (Peso Faixa B)
-        ItemCompra itemUnico = new ItemCompra(1L, produtoLeve, 8L);
-        carrinho.setItens(Collections.singletonList(itemUnico));
-
-        // ACT
-        BigDecimal custoTotalCalculado = compraService.calcularCustoTotal(carrinho, clienteBronze.getRegiao(), clienteBronze.getTipo());
-
-        // ASSERT
-        assertThat(custoTotalCalculado).isEqualByComparingTo("4924.00");
-    }
-}*/
-
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
@@ -144,9 +36,12 @@ public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase
     // ---------------------- Utilidades locais ----------------------
 
     private Produto baseProdutoNaoFragil() {
-        // preço 10, peso 4kg (Faixa A), dimensões positivas
         return new Produto(1000L, "Base", "...", new BigDecimal("10.00"),
-                4.0, 1, 1, 1, false, TipoProduto.ELETRONICO);
+                BigDecimal.valueOf(4.0), // peso
+                BigDecimal.valueOf(1),   // c
+                BigDecimal.valueOf(1),   // l
+                BigDecimal.valueOf(1),   // a
+                false, TipoProduto.ELETRONICO);
     }
 
     private CarrinhoDeCompras carrinhoCom(ItemCompra... itens) {
@@ -167,7 +62,7 @@ public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase
     @Test
     @DisplayName("Base válido: carrinho ok, 1 item não frágil (4kg), SE/BRONZE (frete isento)")
     void baseValido() {
-        Produto p = baseProdutoNaoFragil();
+        Produto p = baseProdutoNaoFragil(); 
         CarrinhoDeCompras carrinho = carrinhoCom(new ItemCompra(1L, p, 1L));
 
         BigDecimal total = compraService.calcularCustoTotal(carrinho, Regiao.SUDESTE, TipoCliente.BRONZE);
@@ -209,12 +104,13 @@ public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase
                 .hasMessageContaining("Carrinho não pode estar vazio");
     }
 
+
     // ---------------------- ITENS DO CARRINHO ----------------------
 
     @Test
     @DisplayName("P6: quantidade = 0 → 'A quantidade do item deve ser positiva.'")
     void P6_quantidadeZero() {
-        Produto p = baseProdutoNaoFragil();
+        Produto p = baseProdutoNaoFragil(); // Correto
         CarrinhoDeCompras c = carrinhoCom(new ItemCompra(1L, p, 0L));
 
         assertThatThrownBy(() ->
@@ -227,7 +123,11 @@ public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase
     @DisplayName("P8: preço unitário < 0 → 'O preço do item não pode ser negativo.'")
     void P8_precoNegativo() {
         Produto p = new Produto(1001L, "X", "...", new BigDecimal("-0.01"),
-                4.0, 1, 1, 1, false, TipoProduto.ELETRONICO);
+                BigDecimal.valueOf(4.0), // peso
+                BigDecimal.valueOf(1),   // c
+                BigDecimal.valueOf(1),   // l
+                BigDecimal.valueOf(1),   // a
+                false, TipoProduto.ELETRONICO);
         CarrinhoDeCompras c = carrinhoCom(new ItemCompra(1L, p, 1L));
 
         assertThatThrownBy(() ->
@@ -240,7 +140,11 @@ public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase
     @DisplayName("P10: peso físico = 0 → 'O peso físico do item deve ser positivo.'")
     void P10_pesoFisicoZero() {
         Produto p = new Produto(1002L, "X", "...", new BigDecimal("10.00"),
-                0.0, 1, 1, 1, false, TipoProduto.ELETRONICO);
+                BigDecimal.valueOf(0.0), // peso
+                BigDecimal.valueOf(1),   // c
+                BigDecimal.valueOf(1),   // l
+                BigDecimal.valueOf(1),   // a
+                false, TipoProduto.ELETRONICO);
         CarrinhoDeCompras c = carrinhoCom(new ItemCompra(1L, p, 1L));
 
         assertThatThrownBy(() ->
@@ -253,7 +157,11 @@ public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase
     @DisplayName("P12: alguma dimensão = 0 → 'As dimensões (C, L, A) do item devem ser positivas.'")
     void P12_dimensaoZero() {
         Produto p = new Produto(1003L, "X", "...", new BigDecimal("10.00"),
-                4.0, 0, 1, 1, false, TipoProduto.ELETRONICO);
+                BigDecimal.valueOf(4.0), // peso
+                BigDecimal.valueOf(0),   // c
+                BigDecimal.valueOf(1),   // l
+                BigDecimal.valueOf(1),   // a
+                false, TipoProduto.ELETRONICO);
         CarrinhoDeCompras c = carrinhoCom(new ItemCompra(1L, p, 1L));
 
         assertThatThrownBy(() ->
@@ -266,20 +174,27 @@ public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase
     @DisplayName("P13: item frágil = true → taxa adicional de frágil (+5)")
     void P13_itemFragil() {
         Produto p = new Produto(1004L, "X", "...", new BigDecimal("10.00"),
-                4.0, 1, 1, 1, true, TipoProduto.ELETRONICO);
+                BigDecimal.valueOf(4.0), // peso
+                BigDecimal.valueOf(1),   // c
+                BigDecimal.valueOf(1),   // l
+                BigDecimal.valueOf(1),   // a
+                true, TipoProduto.ELETRONICO);
         CarrinhoDeCompras c = carrinhoCom(new ItemCompra(1L, p, 1L));
 
         BigDecimal total = compraService.calcularCustoTotal(c, Regiao.SUDESTE, TipoCliente.BRONZE);
-        // frete isento por peso, mas aplica taxa frágil (+5)
+        // frete isento por peso (4kg), mas aplica taxa frágil (+5)
         assertThat(total).isEqualByComparingTo("15.00");
     }
 
     // ---------------------- DESCONTO POR QUANTIDADE (mesmo tipo) ----------------------
 
     private Produto grupoPreco100Peso050() {
-        // peso 0,5 kg por item: até 8 itens continua na faixa isenta
         return new Produto(1100L, "G100", "...", new BigDecimal("100.00"),
-                0.5, 1, 1, 1, false, TipoProduto.ELETRONICO);
+                BigDecimal.valueOf(0.5), // peso
+                BigDecimal.valueOf(1),   // c
+                BigDecimal.valueOf(1),   // l
+                BigDecimal.valueOf(1),   // a
+                false, TipoProduto.ELETRONICO);
     }
 
     @Test
@@ -312,7 +227,11 @@ public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase
 
     private CarrinhoDeCompras carrinhoPeso8kgSubtotal100() {
         Produto p = new Produto(1200L, "8kg", "...", new BigDecimal("100.00"),
-                8.0, 10, 10, 10, false, TipoProduto.LIVRO); // 8kg => faixa B
+                BigDecimal.valueOf(8.0), // peso
+                BigDecimal.valueOf(10),  // c
+                BigDecimal.valueOf(10),  // l
+                BigDecimal.valueOf(10),  // a
+                false, TipoProduto.LIVRO); // 8kg => faixa B
         return carrinhoCom(new ItemCompra(1L, p, 1L));
     }
 
@@ -366,7 +285,11 @@ public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase
     @DisplayName("P33: peso total = 15 kg → Faixa C (4*w + 12)")
     void P33_pesoFaixaC() {
         Produto p = new Produto(1300L, "15kg", "...", new BigDecimal("100.00"),
-                15.0, 10, 10, 10, false, TipoProduto.LIVRO);
+                BigDecimal.valueOf(15.0), // peso
+                BigDecimal.valueOf(10),   // c
+                BigDecimal.valueOf(10),   // l
+                BigDecimal.valueOf(10),   // a
+                false, TipoProduto.LIVRO);
         CarrinhoDeCompras c = carrinhoCom(new ItemCompra(1L, p, 1L));
 
         BigDecimal total = compraService.calcularCustoTotal(c, Regiao.SUDESTE, TipoCliente.BRONZE);
@@ -377,7 +300,11 @@ public class CompraServiceParticaoEquivalenciaTest extends CompraServiceTestBase
     @DisplayName("P34: peso total = 60 kg → Faixa D (7*w + 12)")
     void P34_pesoFaixaD() {
         Produto p = new Produto(1301L, "60kg", "...", new BigDecimal("100.00"),
-                60.0, 10, 10, 10, false, TipoProduto.LIVRO);
+                BigDecimal.valueOf(60.0), // peso
+                BigDecimal.valueOf(10),   // c
+                BigDecimal.valueOf(10),   // l
+                BigDecimal.valueOf(10),   // a
+                false, TipoProduto.LIVRO);
         CarrinhoDeCompras c = carrinhoCom(new ItemCompra(1L, p, 1L));
 
         BigDecimal total = compraService.calcularCustoTotal(c, Regiao.SUDESTE, TipoCliente.BRONZE);

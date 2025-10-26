@@ -22,12 +22,12 @@ public class Produto
 	private BigDecimal precoUnitario;
 
 	/** Peso físico em quilogramas (kg). */
-	private double pesoFisico;
+	private BigDecimal pesoFisico;
 
 	/** Dimensões em centímetros (cm). */
-	private double comprimento;
-	private double largura;
-	private double altura;
+	private BigDecimal comprimento;
+	private BigDecimal largura;
+	private BigDecimal altura;
 
 	/** Indica se o produto é frágil. */
 	private boolean fragil;
@@ -39,8 +39,8 @@ public class Produto
 	{
 	}
 
-	public Produto(Long id, String nome, String descricao, BigDecimal precoUnitario, double pesoFisico,
-			double comprimento, double largura, double altura, boolean fragil, TipoProduto tipo)
+	public Produto(Long id, String nome, String descricao, BigDecimal precoUnitario, BigDecimal pesoFisico,
+			BigDecimal comprimento, BigDecimal largura, BigDecimal altura, boolean fragil, TipoProduto tipo)
 	{
 		this.id = id;
 		this.nome = nome;
@@ -95,42 +95,42 @@ public class Produto
 		this.precoUnitario = precoUnitario;
 	}
 
-	public double getPesoFisico()
+	public BigDecimal getPesoFisico()
 	{
 		return pesoFisico;
 	}
 
-	public void setPesoFisico(double pesoFisico)
+	public void setPesoFisico(BigDecimal pesoFisico)
 	{
 		this.pesoFisico = pesoFisico;
 	}
 
-	public double getComprimento()
+	public BigDecimal getComprimento()
 	{
 		return comprimento;
 	}
 
-	public void setComprimento(double comprimento)
+	public void setComprimento(BigDecimal comprimento)
 	{
 		this.comprimento = comprimento;
 	}
 
-	public double getLargura()
+	public BigDecimal getLargura()
 	{
 		return largura;
 	}
 
-	public void setLargura(double largura)
+	public void setLargura(BigDecimal largura)
 	{
 		this.largura = largura;
 	}
 
-	public double getAltura()
+	public BigDecimal getAltura()
 	{
 		return altura;
 	}
 
-	public void setAltura(double altura)
+	public void setAltura(BigDecimal altura)
 	{
 		this.altura = altura;
 	}

@@ -3,6 +3,7 @@ package ecommerce.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.math.MathContext; 
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -62,7 +63,6 @@ public class CompraService
 			throw new IllegalStateException("Itens fora de estoque.");
 		}
 
-		// ajustado para passar o objeto 'cliente' inteiro.
 		BigDecimal custoTotal = calcularCustoTotal(carrinho, cliente.getRegiao(), cliente.getTipo());
 
 		PagamentoDTO pagamento = pagamentoExternal.autorizarPagamento(cliente.getId(), custoTotal.doubleValue());
@@ -127,37 +127,44 @@ public class CompraService
 	private static final BigDecimal DESCONTO_10_PORCENTO = new BigDecimal("0.10");
     private static final BigDecimal DESCONTO_15_PORCENTO = new BigDecimal("0.15");
 	private static final BigDecimal DESCONTO_20_PORCENTO = new BigDecimal("0.20");
-	private static final double FATOR_PESO_CUBICO = 6000.0;
+	private static final BigDecimal FATOR_PESO_CUBICO = new BigDecimal("6000.0");
+	
 	private static final BigDecimal TAXA_MINIMA_FRETE = new BigDecimal("12.00");
 	private static final BigDecimal TAXA_ITEM_FRAGIL = new BigDecimal("5.00");
 	private static final BigDecimal DESCONTO_FRETE_PRATA = new BigDecimal("0.50");
 
+	private static final BigDecimal PESO_LIMITE_50 = new BigDecimal("50.0");
+	private static final BigDecimal PESO_LIMITE_10 = new BigDecimal("10.0");
+	private static final BigDecimal PESO_LIMITE_5 = new BigDecimal("5.0");
+	private static final BigDecimal FATOR_FRETE_7 = new BigDecimal("7.00");
+	private static final BigDecimal FATOR_FRETE_4 = new BigDecimal("4.00");
+	private static final BigDecimal FATOR_FRETE_2 = new BigDecimal("2.00");
+
+
 	public void validarItens(CarrinhoDeCompras carrinho) {
 		for (ItemCompra item : carrinho.getItens()) {
 			Produto produto = item.getProduto();
+			
+			// getQuantidade() retorna Long, a comparação com 0 (int) é válida.
 			if (item.getQuantidade() <= 0) {
 				throw new IllegalArgumentException("A quantidade do item deve ser positiva.");
 			}
 			if (item.getProduto().getPrecoUnitario().compareTo(BigDecimal.ZERO) < 0) {
 				throw new IllegalArgumentException("O preço do item não pode ser negativo.");
 			}
-						// Validação do Peso Físico
-			if (produto.getPesoFisico() <= 0) {
-				throw new IllegalArgumentException("O peso físico do item deve ser positivo.");
+			
+			if (produto.getPesoFisico().compareTo(BigDecimal.ZERO) <= 0) {
+			throw new IllegalArgumentException("O peso físico do item deve ser positivo.");
 			}
-			// Validação das Dimensões (essenciais para o peso cúbico)
-			if (produto.getComprimento() <= 0 || produto.getLargura() <= 0 || produto.getAltura() <= 0) {
+
+			if (produto.getComprimento().compareTo(BigDecimal.ZERO) <= 0 ||
+				produto.getLargura().compareTo(BigDecimal.ZERO) <= 0 ||
+				produto.getAltura().compareTo(BigDecimal.ZERO) <= 0) {
+					
 				throw new IllegalArgumentException("As dimensões (C, L, A) do item devem ser positivas.");
 			}
 		}
 	}
-
-	//private BigDecimal calcularSubtotal(CarrinhoDeCompras carrinho) {
-	//	return carrinho.getItens().stream()
-	//			.map(item -> item.getProduto().getPrecoUnitario()
-	//			.multiply(new BigDecimal(item.getQuantidade())))
-	//			.reduce(BigDecimal.ZERO, BigDecimal::add);
-	//}
 
     public BigDecimal aplicarDescontoPorValor(BigDecimal subtotal) {
 		if (subtotal.compareTo(SUBTOTAL_LIMITE_DESCONTO_20) > 0) {
@@ -168,7 +175,7 @@ public class CompraService
             return temp.setScale(2, RoundingMode.HALF_UP);
 		}
 		return subtotal;
-		}
+	}
 
     public BigDecimal calcularSubtotalComDescontoPorItens(CarrinhoDeCompras carrinho) {
         final var qtdPorTipo = new java.util.HashMap<TipoProduto, Long>();
@@ -215,8 +222,8 @@ public class CompraService
     }
 
     public BigDecimal calcularFrete(CarrinhoDeCompras carrinho, Regiao regiao, TipoCliente tipoCliente) {
-    	// 1. Calcular peso total tributável
-    	double pesoTotalTributavel = calcularPesoTotalTributavel(carrinho);
+		// 1. Calcular peso total tributável
+    	BigDecimal pesoTotalTributavel = calcularPesoTotalTributavel(carrinho);
 
 		// 2. Calcular frete base (baseado no peso + taxa mínima)
 		BigDecimal freteBase = calcularFreteBasePorPeso(pesoTotalTributavel);
@@ -238,33 +245,55 @@ public class CompraService
 	 * Calcula o peso total tributável do carrinho, considerando o maior valor entre
 	 peso físico e peso cúbico (cubagem) de cada item.
 	 */
-    public double calcularPesoTotalTributavel(CarrinhoDeCompras carrinho) {
+    public BigDecimal calcularPesoTotalTributavel(CarrinhoDeCompras carrinho) {
 		return carrinho.getItens().stream()
-				.mapToDouble(this::calcularPesoTributavelItem)
-				.sum();
+				.map(this::calcularPesoTributavelItem)
+				.reduce(BigDecimal.ZERO, BigDecimal::add); // Soma BigDecimals
 	}
 
-	//Calcula o peso tributável para um único ItemCompra (unidade * quantidade).
-
-    public double calcularPesoTributavelItem(ItemCompra item) {
+	/**
+	 * Calcula o peso tributável para um único ItemCompra (unidade * quantidade).
+	 */
+    public BigDecimal calcularPesoTributavelItem(ItemCompra item) {
 		Produto produto = item.getProduto();
-		double pesoCubico = (produto.getComprimento() * produto.getLargura() * produto.getAltura()) / FATOR_PESO_CUBICO;
-		double pesoTributavelUnidade = Math.max(produto.getPesoFisico(), pesoCubico);
-		return pesoTributavelUnidade * item.getQuantidade();
 
+		// 1. Obter todos os valores
+        BigDecimal comprimento = produto.getComprimento();
+        BigDecimal largura = produto.getLargura();
+        BigDecimal altura = produto.getAltura();
+        BigDecimal pesoFisico = produto.getPesoFisico();
+
+        // 3. Calcular o volume (C * L * A) usando .multiply()
+        BigDecimal volume = comprimento.multiply(largura).multiply(altura);
+
+        // 4. Calcular o peso cúbico (Volume / Fator) usando .divide()
+        BigDecimal pesoCubico = volume.divide(FATOR_PESO_CUBICO, MathContext.DECIMAL64);
+
+        // 5. Obter o maior peso (físico ou cúbico) usando .max()
+        BigDecimal pesoTributavelUnidade = pesoFisico.max(pesoCubico);
+
+        // 6. Converter a quantidade (Long) para BigDecimal
+        BigDecimal quantidade = BigDecimal.valueOf(item.getQuantidade());
+
+        // 7. Calcular o peso total final
+        BigDecimal pesoTotal = pesoTributavelUnidade.multiply(quantidade);
+
+        // 8. Retornar como BigDecimal
+		return pesoTotal;
 	}
 
-	//Calcula o valor do frete base com base nas faixas de peso e aplica a taxa mínima.
-
-    public BigDecimal calcularFreteBasePorPeso(double pesoTotalTributavel) {
+	/**
+	 * Calcula o valor do frete base com base nas faixas de peso e aplica a taxa mínima.
+	 */
+    public BigDecimal calcularFreteBasePorPeso(BigDecimal pesoTotalTributavel) {
 		BigDecimal freteBase = BigDecimal.ZERO;
 
-		if (pesoTotalTributavel > 50.0) {
-			freteBase = new BigDecimal(pesoTotalTributavel).multiply(new BigDecimal("7.00"));
-		} else if (pesoTotalTributavel > 10.0) {
-			freteBase = new BigDecimal(pesoTotalTributavel).multiply(new BigDecimal("4.00"));
-		} else if (pesoTotalTributavel > 5.0) {
-			freteBase = new BigDecimal(pesoTotalTributavel).multiply(new BigDecimal("2.00"));
+		if (pesoTotalTributavel.compareTo(PESO_LIMITE_50) > 0) {
+			freteBase = pesoTotalTributavel.multiply(FATOR_FRETE_7);
+		} else if (pesoTotalTributavel.compareTo(PESO_LIMITE_10) > 0) {
+			freteBase = pesoTotalTributavel.multiply(FATOR_FRETE_4);
+		} else if (pesoTotalTributavel.compareTo(PESO_LIMITE_5) > 0) {
+			freteBase = pesoTotalTributavel.multiply(FATOR_FRETE_2);
 		}
 
 		// Adição de taxa mínima
@@ -274,11 +303,11 @@ public class CompraService
 		}
 
         return freteBase.setScale(2, RoundingMode.HALF_UP);
-		//return freteBase; // Retorna 0 se nenhum frete foi calculado
 	}
 
-	//Calcula a taxa total adicional para itens frágeis no carrinho.
-
+	/**
+	 * Calcula a taxa total adicional para itens frágeis no carrinho.
+	 */
     public BigDecimal calcularTaxaItensFrageis(CarrinhoDeCompras carrinho) {
 		return carrinho.getItens().stream()
 				.filter(item -> item.getProduto().isFragil())
@@ -286,8 +315,9 @@ public class CompraService
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
-	//Aplica o desconto de frete com base no nível de fidelidade (TipoCliente).
-
+	/**
+	 * Aplica o desconto de frete com base no nível de fidelidade (TipoCliente).
+	 */
     public BigDecimal aplicarDescontoFidelidadeFrete(BigDecimal freteComRegiao, TipoCliente tipoCliente) {
 		switch (tipoCliente) {
 			case OURO:

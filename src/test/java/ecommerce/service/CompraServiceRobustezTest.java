@@ -64,7 +64,13 @@ public class CompraServiceRobustezTest extends CompraServiceTestBase {
     @DisplayName("Cobre: Validação de Preço < 0")
     void deveLancarExcecaoParaPrecoNegativo() {
         // ARRANGE
-        Produto produtoPrecoNegativo = new Produto(5L, "Inválido", "...", new BigDecimal("-10.00"), 1, 1, 1, 1, false, null);
+        Produto produtoPrecoNegativo = new Produto(5L, "Inválido", "...", new BigDecimal("-10.00"), 
+            BigDecimal.valueOf(1), // peso
+            BigDecimal.valueOf(1), // comprimento
+            BigDecimal.valueOf(1), // largura
+            BigDecimal.valueOf(1), // altura
+            false, 
+            null);
         CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
         ItemCompra itemComErro = new ItemCompra(1L, produtoPrecoNegativo, 1L);
         carrinho.setItens(Collections.singletonList(itemComErro));
@@ -81,7 +87,6 @@ public class CompraServiceRobustezTest extends CompraServiceTestBase {
     @DisplayName("Cobre: Validação de Peso <= 0")
     void deveLancarExcecaoParaPesoNegativo() {
         // ARRANGE
-        // produtoComPesoErrado é inicializado no setUp com peso -60.0
         CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
         ItemCompra itemComErro = new ItemCompra(1L, produtoComPesoErrado, 1L);
         carrinho.setItens(Collections.singletonList(itemComErro));
@@ -91,7 +96,7 @@ public class CompraServiceRobustezTest extends CompraServiceTestBase {
             compraService.calcularCustoTotal(carrinho, clienteBronze.getRegiao(), clienteBronze.getTipo());
         })
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("O peso físico do item deve ser positivo."); // Mensagem inferida
+        .hasMessageContaining("O peso físico do item deve ser positivo.");
     }
     
     @Test
@@ -114,11 +119,11 @@ public class CompraServiceRobustezTest extends CompraServiceTestBase {
     @DisplayName("Cobre: Validação de Dimensão (Comprimento <= 0)")
     void deveLancarExcecaoParaComprimentoInvalido() {
         // ARRANGE
-        // Produto com comprimento ZERO
-        Produto produtoInvalido = new Produto(6L, "Invalido", "...", new BigDecimal("10.00"), 1, 
-                                              0,  // Comprimento
-                                              10, // Largura
-                                              10, // Altura
+        Produto produtoInvalido = new Produto(6L, "Invalido", "...", new BigDecimal("10.00"), 
+                                              BigDecimal.valueOf(1),  // peso
+                                              BigDecimal.valueOf(0),  // Comprimento
+                                              BigDecimal.valueOf(10), // Largura
+                                              BigDecimal.valueOf(10), // Altura
                                               false, null);
         
         CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
@@ -137,11 +142,11 @@ public class CompraServiceRobustezTest extends CompraServiceTestBase {
     @DisplayName("Cobre: Validação de Dimensão (Largura <= 0)")
     void deveLancarExcecaoParaLarguraInvalida() {
         // ARRANGE
-        // Produto com largura NEGATIVA
-        Produto produtoInvalido = new Produto(7L, "Invalido", "...", new BigDecimal("10.00"), 1, 
-                                              10,  // Comprimento
-                                              -5,  // Largura
-                                              10,  // Altura
+        Produto produtoInvalido = new Produto(7L, "Invalido", "...", new BigDecimal("10.00"), 
+                                              BigDecimal.valueOf(1), 
+                                              BigDecimal.valueOf(10),  // Comprimento
+                                              BigDecimal.valueOf(-5),  // Largura
+                                              BigDecimal.valueOf(10),  // Altura
                                               false, null);
         
         CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
@@ -160,11 +165,11 @@ public class CompraServiceRobustezTest extends CompraServiceTestBase {
     @DisplayName("Cobre: Validação de Dimensão (Altura <= 0)")
     void deveLancarExcecaoParaAlturaInvalida() {
         // ARRANGE
-        // Produto com altura ZERO
-        Produto produtoInvalido = new Produto(8L, "Invalido", "...", new BigDecimal("10.00"), 1, 
-                                              10, // Comprimento
-                                              10, // Largura
-                                              0,  // Altura
+        Produto produtoInvalido = new Produto(8L, "Invalido", "...", new BigDecimal("10.00"), 
+                                              BigDecimal.valueOf(1), 
+                                              BigDecimal.valueOf(10), // Comprimento
+                                              BigDecimal.valueOf(10), // Largura
+                                              BigDecimal.valueOf(0),  // Altura
                                               false, null);
         
         CarrinhoDeCompras carrinho = new CarrinhoDeCompras();

@@ -45,24 +45,49 @@ public abstract class CompraServiceTestBase {
         clienteOuro.setRegiao(Regiao.SUDESTE);
         clienteOuro.setTipo(TipoCliente.OURO); // 100% desconto frete
 
-       // Subtotal > 500, Peso Leve (1kg)
-        this.produtoLeve = new Produto(1L, "Celular", "...", new BigDecimal("900.00"), 1.0, 15, 8, 2, false, 
+        // Subtotal > 500, Peso Leve (1kg)
+        this.produtoLeve = new Produto(1L, "Celular", "...", new BigDecimal("900.00"), 
+            BigDecimal.valueOf(1.0), // peso
+            BigDecimal.valueOf(15),  // comprimento
+            BigDecimal.valueOf(8),   // largura
+            BigDecimal.valueOf(2),   // altura
+            false, 
             TipoProduto.ELETRONICO); 
         
         // Subtotal > 1000, Peso Médio (8kg), Frágil
-        this.produtoMedio = new Produto(2L, "Monitor 4k", "...", new BigDecimal("1200.00"), 8.0, 60, 40, 15, true, 
+        this.produtoMedio = new Produto(2L, "Monitor 4k", "...", new BigDecimal("1200.00"), 
+            BigDecimal.valueOf(8.0), 
+            BigDecimal.valueOf(60), 
+            BigDecimal.valueOf(40), 
+            BigDecimal.valueOf(15), 
+            true, 
             TipoProduto.ELETRONICO); 
         
         // Subtotal < 500, Peso Pesado (15kg)
-        this.produtoPesado = new Produto(3L, "Halter 15kg", "...", new BigDecimal("400.00"), 15.0, 30, 15, 15, false, 
+        this.produtoPesado = new Produto(3L, "Halter 15kg", "...", new BigDecimal("400.00"), 
+            BigDecimal.valueOf(15.0), 
+            BigDecimal.valueOf(30), 
+            BigDecimal.valueOf(15), 
+            BigDecimal.valueOf(15), 
+            false, 
             TipoProduto.MOVEL);
 
         // Subtotal < 500, Peso Muito Pesado (60kg)
-        this.produtoMuitoPesado = new Produto(4L, "Saco de Cimento", "...", new BigDecimal("100.00"), 60.0, 80, 50, 10, false, 
+        this.produtoMuitoPesado = new Produto(4L, "Saco de Cimento", "...", new BigDecimal("100.00"), 
+            BigDecimal.valueOf(60.0), 
+            BigDecimal.valueOf(80), 
+            BigDecimal.valueOf(50), 
+            BigDecimal.valueOf(10), 
+            false, 
             TipoProduto.MOVEL); 
     
         // Produto com peso negativo (para testes de robustez)
-        this.produtoComPesoErrado = new Produto(5L, "Produto Inválido", "...", new BigDecimal("100.00"), -60.0, 80, 50, 10, false, 
+        this.produtoComPesoErrado = new Produto(5L, "Produto Inválido", "...", new BigDecimal("100.00"), 
+            BigDecimal.valueOf(-60.0), // Peso negativo
+            BigDecimal.valueOf(80), 
+            BigDecimal.valueOf(50), 
+            BigDecimal.valueOf(10), 
+            false, 
             TipoProduto.MOVEL);
     }
 }
