@@ -314,7 +314,7 @@ V(G) = 28 + 1
 V(G) = 29
 
 ### Cobertura dos testes
-![Logo](assets/Cobertura.png)
+![Logo](./assets/Cobertura.png)
 
 ### Grafos dos Metodos
 
