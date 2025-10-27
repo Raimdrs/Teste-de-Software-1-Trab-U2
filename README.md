@@ -1,6 +1,19 @@
 # Trabalho de Testes de Software - Finalizar Compra E-commerce
 
-Este projeto contém a implementação dos testes de unidade automatizados, funcionais (caixa-preta) e estruturais (caixa-branca), para o método `calcularCustoTotal` do `CompraService` de uma aplicação de e-commerce. O objetivo é testar de forma isolada a lógica de cálculo de preço total da compra.
+Este projeto contém a implementação dos testes de unidade automatizados, funcionais (caixa-preta) e 
+estruturais (caixa-branca), para o método `calcularCustoTotal` do `CompraService` de uma aplicação de 
+e-commerce. O objetivo é testar de forma isolada a lógica de cálculo de preço total da compra.
+
+Durante a implementação dos métodos auxiliares da função principal `calcularCustoTotal`, optamos por 
+aplicar arredondamento nos retornos numéricos. Essa decisão foi motivada principalmente pela 
+necessidade de testar cada método de forma isolada. Sem o arredondamento, os resultados apresentavam 
+valores com muitas casas decimais — por exemplo, `2.5848522932829` — o que dificultava tanto a leitura 
+quanto a comparação exata nos testes unitários. O método de arrendondamento utilizado 
+foi o `RoundingMode.HALF_UP`.
+
+A técnica de dividir nossa função principal de teste foi
+para diminuir a camplexidade e melhorar o entendimento da tabela  de decisão, a divisão feita foi explicada
+melhor no tópico de tabelas de decição.
 
 ## Pré-requisitos
 
