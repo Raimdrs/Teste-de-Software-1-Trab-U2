@@ -1,3 +1,55 @@
+# Trabalho de Testes de Software - Finalizar Compra E-commerce
+
+Este projeto contém a implementação dos testes de unidade automatizados, funcionais (caixa-preta) e estruturais (caixa-branca), para o método `calcularCustoTotal` do `CompraService` de uma aplicação de e-commerce. O objetivo é testar de forma isolada a lógica de cálculo de preço total da compra.
+
+## Pré-requisitos
+
+Para compilar o projeto e executar os testes, você precisará ter instalados em seu sistema:
+
+* Java JDK (versão 17 ou superior)
+* Apache Maven (versão 3.6 ou superior)
+
+## Como Executar os Testes
+
+Este é um projeto Maven e segue sua estrutura padrão. Todos os testes automatizados (JUnit 5) podem ser executados através do ciclo de vida padrão do Maven.
+
+1.  Descompacte o arquivo `.zip` do projeto em um diretório de sua preferência.
+2.  Abra um terminal (Prompt de Comando, PowerShell, Terminal, etc.).
+3.  Navegue até o diretório raiz do projeto (a pasta que contém o arquivo `pom.xml`).
+4.  Execute o seguinte comando:
+
+    ```bash
+    mvn test
+    ```
+
+Este comando irá baixar todas as dependências necessárias, compilar o código-fonte e, em seguida, compilar e executar todas as classes de teste localizadas em `src/test/java`.
+
+Ao final da execução, o Maven exibirá um resumo no console, informando `BUILD SUCCESS` se todos os testes passarem, ou `BUILD FAILURE` se algum teste falhar.
+
+## Como Verificar a Cobertura dos Testes
+
+O projeto está configurado com o plugin **JaCoCo** para gerar relatórios de cobertura de código. A cobertura é avaliada durante a fase de teste.
+
+1.  Execute o seguinte comando:
+
+    ```bash
+    mvn verify
+    ```
+
+2.  Após a execução bem-sucedida, o relatório de cobertura será gerado no seguinte diretório:
+
+    `target/site/jacoco/`
+
+3.  Abra o arquivo `index.html` em qualquer navegador web para visualizar o relatório de cobertura interativo.
+
+4.  No relatório, navegue até o pacote `ecommerce.service` e clique em `CompraService` para inspecionar a cobertura detalhada do método `calcularCustoTotal`.
+
+---
+
+### Projeto de Testes e Análise Estrutural
+
+A seguir, é apresentado o projeto de testes funcionais (caixa-preta) e a análise estrutural (caixa-branca) do método `calcularCustoTotal` e seus métodos auxiliares.
+
 ## Partições de Domínio
 
 ### Carinho de compras:
@@ -260,6 +312,9 @@ P_total = 28
 V(G) = P_total + 1
 V(G) = 28 + 1
 V(G) = 29
+
+### Cobertura dos testes
+![Logo](assets/Cobertura.PNG)
 
 ### Grafos dos Metodos
 
