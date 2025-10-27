@@ -7,11 +7,29 @@ Este projeto contém a implementação dos testes de unidade automatizados, func
 Para compilar o projeto e executar os testes, você precisará ter instalados em seu sistema:
 
 * Java JDK (versão 17 ou superior)
-* Apache Maven (versão 3.6 ou superior)
+* Apache Maven (versão 3.8 ou superior)
+
+## Como Executar a Aplicação
+
+Este projeto é uma aplicação Spring Boot. Para executá-la (iniciar o servidor):
+
+1.  Abra um terminal (Prompt de Comando, PowerShell, Terminal, etc.).
+
+2.  Navegue até o diretório raiz do projeto (a pasta que contém o arquivo pom.xml).
+
+3.  Execute o seguinte comando:
+
+    ```bash
+    mvn spring-boot:run
+    ```
+
+4.  Este comando irá baixar as dependências, compilar o código e iniciar o servidor web. Por padrão, a aplicação estará disponível em `http://localhost:8080`
 
 ## Como Executar os Testes
 
 Este é um projeto Maven e segue sua estrutura padrão. Todos os testes automatizados (JUnit 5) podem ser executados através do ciclo de vida padrão do Maven.
+
+Para executar apenas a suíte de testes automatizados (JUnit 5) sem iniciar a aplicação, siga os passos:
 
 1.  Descompacte o arquivo `.zip` do projeto em um diretório de sua preferência.
 2.  Abra um terminal (Prompt de Comando, PowerShell, Terminal, etc.).
@@ -49,6 +67,15 @@ O projeto está configurado com o plugin **JaCoCo** para gerar relatórios de co
 ### Projeto de Testes e Análise Estrutural
 
 A seguir, é apresentado o projeto de testes funcionais (caixa-preta) e a análise estrutural (caixa-branca) do método `calcularCustoTotal` e seus métodos auxiliares.
+
+**Artefatos de Análise:**
+
+Todos os artefatos visuais gerados para esta análise, incluindo:
+
+* Grafos de Fluxo de Controle (CFG)
+* A captura de tela (screenshot) do relatório de cobertura de testes (JaCoCo)
+
+Estão localizados no diretório `/assets` deste projeto.
 
 ## Partições de Domínio
 
